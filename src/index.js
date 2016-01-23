@@ -5,6 +5,27 @@ $(()=> {
     let $template = $("#template");
     let $animation = $("#animation");
 
+    var config = JSON.parse($template.find(".config").text());
+
+    var makeProcessor = function (processFn) {
+        return function ($node, $root, callback) {
+            for (var i = 0; i < $node[0].attributes.length; i++) {
+                for (var j = 0; j < config.types.length; j++) {
+                    if ($node[0].attributes[i].name == "data-type") {
+                        if ($node[0].attributes[i].value == config.types[j].name) {
+                            for (var propName in config.types[j].properties) {
+                                $node.attr(propName, config.types[j].properties[propName]);
+                            }
+                            processFn($node, $root, callback)
+                            return;
+                        }
+                    }
+                }
+            }
+            processFn($node, $root, callback)
+        }
+    };
+
     let NodeType = {
         element: 1,
         attribute: 2,
@@ -112,8 +133,8 @@ $(()=> {
     };
 
     let processors = {
-        "type": processTypeNode,
-        "wait": processWaitNode
+        "type": makeProcessor(processTypeNode),
+        "wait": makeProcessor(processWaitNode)
     };
 
     let append = function ($root, $node, desiredTag) {
@@ -177,6 +198,8 @@ $(()=> {
 
         processNode($(nodes[index]).clone(), $root, animateRemainingNodes);
     };
+
+
 
     runAnimation($template.contents(), $animation);
 });

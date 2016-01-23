@@ -27,7 +27,7 @@ $(()=> {
         }, duration);
     };
 
-    let scrollDown = function() {
+    let scrollDown = function () {
         window.scroll(0, document.documentElement.offsetHeight)
     };
 
@@ -40,7 +40,7 @@ $(()=> {
 
         let charInterval = parseDuration($node.attr("data-char-interval") || defaultCharInterval);
         let periodInterval = parseDuration($node.attr("data-period-interval") || defaultPeriodInterval);
-        let commaInterval = parseDuration($node.attr("data-period-interval") || defaultCommaInterval);
+        let commaInterval = parseDuration($node.attr("data-comma-interval") || defaultCommaInterval);
         let endInterval = parseDuration($node.attr("data-end-interval") || defaultEndInterval);
         let wordInterval = parseDuration($node.attr("data-word-interval") || defaultWordInterval);
 

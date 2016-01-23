@@ -11,11 +11,30 @@
 </head>
 <body>
 <div id="template">
+    <script class="config" type="application/json">
+        {
+            "types": [
+                {
+                    "name": "robot",
+                    "properties": {
+                        "data-char-interval": "0ms",
+                        "data-period-interval": "0ms",
+                        "data-comma-interval": "0ms",
+                        "data-end-interval": "0ms",
+                        "data-word-interval": "200ms"
+                    }
+                }
+            ]
+        }
+    </script>
     <div class="container">
         <type>this is tply</type>
         <wait>1s</wait>
         <br>
         <type>it allows you to type</type>
+        <wait>1s</wait>
+        <br>
+        <robot>I am a robot wow</robot>
     </div>
 </div>
 <div id="animation">

@@ -16,7 +16,9 @@ $(()=> {
                             for (var propName in config.types[j].properties) {
                                 $node.attr(propName, config.types[j].properties[propName]);
                             }
-                            processFn($node, $root, callback)
+
+                            $node.addClass(config.types[j].styleClasses || "")
+                            processFn($node, $root, callback);
                             return;
                         }
                     }

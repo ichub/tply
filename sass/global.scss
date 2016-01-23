@@ -1,0 +1,70 @@
+$back-color: rgb(255, 255, 255);
+$text-color: rgb(40, 40, 40);
+$content-width: 1000px;
+$max-content-width: 80vw;
+$font-monospace: 'Inconsolata', monospace;
+$font-normal: 'Arvo', serif;
+
+$accent-blue: rgb(50, 38, 197);
+$accent-2: rgb(148, 64, 114);
+
+body {
+  background-color: $back-color;
+  font-family: $font-monospace;
+  color: $text-color;
+}
+
+#template {
+  display: none;
+}
+
+#animation {
+  margin-top: 20px;
+}
+
+.title {
+  font-size: 4em;
+  margin-top: 25px;
+  margin-bottom: 50px;
+  font-weight: bolder;
+  text-align: center;
+  font-family: 'Lobster', cursive;
+}
+
+.container {
+  width: $content-width;
+  max-width: $max-content-width;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 100px;
+  padding-bottom: 300px;
+}
+
+p {
+  text-indent: 30px;
+  line-height: 1.5em;
+}
+
+.character {
+  @extend .fadein;
+}
+
+.no-char-fade {
+  .character {
+    animation: none;
+  }
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fadein {
+  animation-name: fadein;
+  animation-duration: 500ms;
+}

@@ -145,7 +145,7 @@ $(()=> {
     };
 
     let processDefaultNode = function ($node, $root, callback) {
-        runAnimation($node.contents(), append($root, $node, ""), callback);
+        runAnimation($node.contents(), append($root, $node), callback);
     };
 
     let processors = {

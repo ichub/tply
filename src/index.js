@@ -70,7 +70,7 @@ $(()=> {
         window.scroll(0, document.documentElement.offsetHeight);
     };
 
-    let processTypeNode = function ($node, $root, callback) {
+    let mapCharToInteval = function ($node, char, isEnd) {
         let defaultCharInterval = "50ms";
         let defaultPeriodInterval = "500ms";
         let defaultCommaInterval = "300ms";
@@ -91,59 +91,53 @@ $(()=> {
             wordInterval = 100;
         }
 
-        let contents = $node.contents();
-
-        if (contents.length > 0) {
-
+        if (isEnd) {
+            return endInterval;
+        } else if (char === "." || char === "?" || char === "!") {
+            return Math.max(charInterval, periodInterval);
+        } else if (char === " ") {
+            return Math.max(wordInterval, charInterval);
+        } else if (char === ",") {
+            return Math.max(charInterval, commaInterval);
         }
 
-        let mapCharToInteval = function (char, isEnd) {
-            if (isEnd) {
-                return endInterval;
-            } else if (char === "." || char === "?" || char === "!") {
-                return Math.max(charInterval, periodInterval);
-            } else if (char === " ") {
-                return Math.max(wordInterval, charInterval);
-            } else if (char === ",") {
-                return Math.max(charInterval, commaInterval);
-            }
+        return charInterval;
+    };
 
-            return charInterval;
-        };
+    let writeText = function (text, $element, callback) {
+        if (text === "") {
+            callback();
+            return;
+        }
 
+        let character = text[0];
+
+        if (character === "\n") {
+            writeText(text.slice(1), $element);
+            return;
+        }
+
+        $element.append(`<span class="character">${character}</span>`);
+
+        let interval = mapCharToInteval($element, character, text.length === 1);
+
+        if (interval === 0) {
+            writeText(text.slice(1), $element, callback);
+            scrollDown();
+        } else {
+            setTimeout(function () {
+                writeText(text.slice(1), $element, callback);
+                scrollDown();
+            }, interval);
+        }
+    };
+
+    let processTypeNode = function ($node, $root, callback) {
         let textToType = $node.text().replace(/\s+/g, ' ');
         $node.text("");
         let $clone = append($root, $node, "span");
 
-        let writeText = function (text, $element) {
-            if (text === "") {
-                callback();
-                return;
-            }
-
-            let character = text[0];
-
-            if (character === "\n") {
-                writeText(text.slice(1), $element);
-                return;
-            }
-
-            $element.append(`<span class="character">${character}</span>`);
-
-            let interval = mapCharToInteval(character, text.length === 1);
-
-            if (interval === 0) {
-                writeText(text.slice(1), $element);
-                scrollDown();
-            } else {
-                setTimeout(function () {
-                    writeText(text.slice(1), $element);
-                    scrollDown();
-                }, interval);
-            }
-        };
-
-        writeText(textToType, $clone);
+        writeText(textToType, $clone, callback);
     };
 
     let processDefaultNode = function ($node, $root, callback) {

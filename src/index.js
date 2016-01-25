@@ -16,7 +16,9 @@ $(()=> {
                     if ($node[0].attributes[i].name === "data-type") {
                         if ($node[0].attributes[i].value === config.types[j].name) {
                             for (var propName in config.types[j].properties) {
-                                $node.attr(propName, config.types[j].properties[propName]);
+                                if (config.types[j].properties.hasOwnProperty(propName)) {
+                                    $node.attr(propName, config.types[j].properties[propName]);
+                                }
                             }
 
                             $node.addClass(config.types[j].styleClasses || "");

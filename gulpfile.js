@@ -6,6 +6,7 @@ let server = require('gulp-server-livereload');
 let watch = require("gulp-watch");
 let babel = require('gulp-babel');
 let browserify = require('gulp-browserify');
+let jshint = require('gulp-jshint');
 
 let sassGlob = './sass/**/*.scss';
 let jsGlob = "./src/**/*.js";
@@ -48,4 +49,10 @@ gulp.task('serve', ["watch"], () => {
             livereload: true,
             open: true
         }));
+});
+
+gulp.task('lint', function() {
+    return gulp.src('./src/*.js')
+        .pipe(jshint('.jshintrc'))
+        .pipe(jshint.reporter('jshint-stylish'));
 });

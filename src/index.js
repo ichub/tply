@@ -133,11 +133,27 @@ $(()=> {
     };
 
     let processTypeNode = function ($node, $root, callback) {
-        let textToType = $node.text().replace(/\s+/g, ' ');
-        $node.text("");
-        let $clone = append($root, $node, "span");
+        let contents = $node.contents();
 
-        writeText(textToType, $clone, callback);
+        if (contents.length > 0) {
+            var index = 0;
+
+            let processNextContent = function () {
+                let textToType = $(contents[index]).text().replace(/\s+/g, ' ');
+                $node.text("");
+                let $clone = append($root, $node, "span");
+
+                if (index++ < contents.length) {
+                    writeText(textToType, $clone, processNextContent);
+                } else {
+                    callback();
+                }
+            };
+
+            processNextContent();
+        } else {
+            callback();
+        }
     };
 
     let processDefaultNode = function ($node, $root, callback) {

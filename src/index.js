@@ -1,7 +1,9 @@
-"use strict";
-let parseDuration = require("parse-duration");
+/* globals $, require */
 
 $(()=> {
+    "use strict";
+    let parseDuration = require("parse-duration");
+
     let $template = $("#template");
     let $animation = $("#animation");
 
@@ -11,22 +13,40 @@ $(()=> {
         return function ($node, $root, callback) {
             for (var i = 0; i < $node[0].attributes.length; i++) {
                 for (var j = 0; j < config.types.length; j++) {
-                    if ($node[0].attributes[i].name == "data-type") {
-                        if ($node[0].attributes[i].value == config.types[j].name) {
+                    if ($node[0].attributes[i].name === "data-type") {
+                        if ($node[0].attributes[i].value === config.types[j].name) {
                             for (var propName in config.types[j].properties) {
                                 $node.attr(propName, config.types[j].properties[propName]);
                             }
 
                             $node.addClass(config.types[j].styleClasses || "");
-                            $node.attr("style", ($node.attr("style") || "") + ";" + (config.types[j].style || ""));
+                            $node.attr("style", $node.attr("style") + ";" + config.types[j].style);
                             processFn($node, $root, callback);
                             return;
                         }
                     }
                 }
             }
-            processFn($node, $root, callback)
+            processFn($node, $root, callback);
+        };
+    };
+
+    let append = function ($root, $node, desiredTag) {
+        var clone = $node.clone();
+        clone.html("");
+
+        if (typeof desiredTag !== 'undefined') {
+            clone = $(`<${desiredTag}>${clone.html()}</${desiredTag}>`);
+
+            $.each($node.prop("attributes"), function () {
+                clone.attr(this.name, this.value);
+            });
+
+            clone.className = $node.className;
         }
+
+        $root.append(clone);
+        return clone;
     };
 
     let NodeType = {
@@ -35,13 +55,6 @@ $(()=> {
         text: 3,
         comment: 8
     };
-
-    class ElementProcessor {
-        constructor(tagName, handler) {
-            this.tagName = tagName;
-            this.handler = handler;
-        }
-    }
 
     let processWaitNode = function ($node, $root, callback) {
         let duration = parseDuration($node.text());
@@ -52,7 +65,7 @@ $(()=> {
     };
 
     let scrollDown = function () {
-        window.scroll(0, document.documentElement.offsetHeight)
+        window.scroll(0, document.documentElement.offsetHeight);
     };
 
     let processTypeNode = function ($node, $root, callback) {
@@ -108,16 +121,16 @@ $(()=> {
 
             let character = text[0];
 
-            if (character == "\n") {
+            if (character === "\n") {
                 writeText(text.slice(1), $element);
                 return;
             }
 
             $element.append(`<span class="character">${character}</span>`);
 
-            let interval = mapCharToInteval(character, text.length == 1);
+            let interval = mapCharToInteval(character, text.length === 1);
 
-            if (interval == 0) {
+            if (interval === 0) {
                 writeText(text.slice(1), $element);
                 scrollDown();
             } else {
@@ -132,7 +145,7 @@ $(()=> {
     };
 
     let processDefaultNode = function ($node, $root, callback) {
-        runAnimation($node.contents(), append($root, $node), callback);
+        runAnimation($node.contents(), append($root, $node, ""), callback);
     };
 
     let processors = {
@@ -140,36 +153,18 @@ $(()=> {
         "wait": makeProcessor(processWaitNode)
     };
 
-    let append = function ($root, $node, desiredTag) {
-        var clone = $node.clone();
-        clone.html("");
-
-        if (typeof desiredTag !== 'undefined') {
-            clone = $(`<${desiredTag}>${clone.html()}</${desiredTag}>`);
-
-            $.each($node.prop("attributes"), function () {
-                clone.attr(this.name, this.value);
-            });
-
-            clone.className = $node.className;
-        }
-
-        $root.append(clone);
-        return clone;
-    };
-
     let processNode = function ($node, $root, callback) {
-        if ($node[0].nodeType == NodeType.element) {
+        if ($node[0].nodeType === NodeType.element) {
             let tag = $node.prop("tagName").toLowerCase();
 
             let matchingProcessor = processors[tag];
 
-            if (typeof matchingProcessor != "undefined") {
+            if (typeof matchingProcessor !== "undefined") {
                 matchingProcessor($node, $root, callback);
             } else {
                 processDefaultNode($node, $root, callback);
             }
-        } else if ($node[0].nodeType == NodeType.text) {
+        } else if ($node[0].nodeType === NodeType.text) {
             $root.append($node.text());
             scrollDown();
             callback();
@@ -201,7 +196,6 @@ $(()=> {
 
         processNode($(nodes[index]).clone(), $root, animateRemainingNodes);
     };
-
 
 
     runAnimation($template.contents(), $animation);

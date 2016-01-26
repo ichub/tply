@@ -1,13 +1,10 @@
 /* globals $, require */
 
-$(()=> {
+(function() {
     "use strict";
     let parseDuration = require("parse-duration");
 
-    let $template = $("#template");
-    let $animation = $("#animation");
-
-    var config = JSON.parse($template.find(".config").text());
+    var config = {types:[]};
 
     var makeProcessor = function (processFn) {
         return function ($node, $root, callback) {
@@ -227,6 +224,9 @@ $(()=> {
         processNode($(nodes[index]).clone(), $root, animateRemainingNodes);
     };
 
-
-    runAnimation($template.contents(), $animation);
-});
+    window.tply = window.tply || {
+        animate: function(from, to, config) {
+            runAnimation($(from).contents(), $(to));
+        }
+    }
+})();

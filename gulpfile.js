@@ -15,6 +15,7 @@ let jsGlob = "./src/**/*.js";
 
 let sassOutputGlob = './css/**/*.css';
 let jsOutputGlob = './dist/**/*.js';
+let htmlGlob = './index.html';
 
 function swallowError(error) {
 
@@ -54,7 +55,7 @@ gulp.task('serve', ["watch"], () => {
             livereload: {
                 enable: true,
                 filter: function (filePath, cb) {
-                    glob([jsOutputGlob, sassOutputGlob], function (err, files) {
+                    glob([jsOutputGlob, sassOutputGlob, htmlGlob], function (err, files) {
                         cb(files.map(function (file) {
                                 return path.resolve(file);
                             }).indexOf(filePath) > -1);

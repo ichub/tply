@@ -104,7 +104,7 @@ $(()=> {
         return charInterval;
     };
 
-    let writeText = function (text, $element, callback) {
+    let writeText = function (text, $typeNode, $element, callback) {
         if (text === "") {
             if (typeof callback === "undefined") {
                 return;
@@ -122,20 +122,21 @@ $(()=> {
 
         $element.append(`<span class="character">${character}</span>`);
 
-        let interval = mapCharToInteval($element, character, text.length === 1);
+        let interval = mapCharToInteval($typeNode, character, text.length === 1);
 
         if (interval === 0) {
-            writeText(text.slice(1), $element, callback);
+            writeText(text.slice(1), $typeNode, $element, callback);
             scrollDown();
         } else {
             setTimeout(function () {
-                writeText(text.slice(1), $element, callback);
+                writeText(text.slice(1), $typeNode, $element, callback);
                 scrollDown();
             }, interval);
         }
     };
 
-    let processTypeNode = function ($node, $root, callback) {
+    let processTypeNode = function ($node, $root, callback, $topLevelTypeNode) {
+        $topLevelTypeNode = $topLevelTypeNode || $node;
         let contents = $node.contents();
 
         if (contents.length >= 1) {
@@ -144,7 +145,7 @@ $(()=> {
 
             let processNextContent = function () {
                 if (index < contents.length) {
-                    processTypeNode($(contents[index++]), appendedRoot, processNextContent);
+                    processTypeNode($(contents[index++]), appendedRoot, processNextContent, $topLevelTypeNode);
                 } else {
                     callback();
                 }
@@ -153,7 +154,7 @@ $(()=> {
             processNextContent();
         } else {
             if ($node[0].nodeType == NodeType.text) {
-                writeText(($node.text() || $node[0].data).replace(/\n/, '').replace(/\s\s+/g, ' '), $root, callback);
+                writeText(($node.text() || $node[0].data).replace(/\n/, '').replace(/\s\s+/g, ' '), $topLevelTypeNode, $root, callback);
             } else {
                 callback();
             }

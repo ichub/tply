@@ -33,9 +33,13 @@ $(()=> {
         };
     };
 
-    let append = function ($root, $node, desiredTag) {
+    let append = function ($root, $node, desiredTag, justCopyIt) {
+        justCopyIt = justCopyIt || false;
+
         var clone = $node.clone();
-        clone.html("");
+        if (!justCopyIt) {
+            clone.html("");
+        }
 
         if (typeof desiredTag !== 'undefined') {
             clone = $(`<${desiredTag}>${clone.html()}</${desiredTag}>`);
@@ -165,9 +169,16 @@ $(()=> {
         runAnimation($node.contents(), append($root, $node), callback);
     };
 
+    let processCodeNode = function ($node, $root, callback) {
+        let clone = append($root, $node, "code", true);
+        hljs.highlightBlock(clone[0]);
+        callback();
+    };
+
     let processors = {
         "type": makeProcessor(processTypeNode),
-        "wait": makeProcessor(processWaitNode)
+        "wait": makeProcessor(processWaitNode),
+        "code": makeProcessor(processCodeNode)
     };
 
     let processNode = function ($node, $root, callback) {

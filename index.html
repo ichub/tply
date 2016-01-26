@@ -6,6 +6,9 @@
     <link href='https://fonts.googleapis.com/css?family=Arvo:400,400italic,700,700italic' rel='stylesheet'
           type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/default.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
     <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
     <script src="/dist/index.js"></script>
 </head>
@@ -49,6 +52,15 @@
                 best part is, it's basically the same as writing normal HTML.
             </p>
         </type>
+        <pre><code class="javascript">if (isEnd) {
+    return endInterval;
+} else if (char === "." || char === "?" || char === "!") {
+    return Math.max(charInterval, periodInterval);
+} else if (char === " ") {
+    return Math.max(wordInterval, charInterval);
+} else if (char === ",") {
+    return Math.max(charInterval, commaInterval);
+}</code></pre>
     </div>
 </div>
 <div id="animation">

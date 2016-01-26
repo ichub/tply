@@ -152,7 +152,7 @@ $(()=> {
             processNextContent();
         } else {
             if ($node[0].nodeType == NodeType.text) {
-                writeText($node.text() || $node[0].data, $root, callback);
+                writeText(($node.text() || $node[0].data).replace(/\s\s+/g, ' '), $root, callback);
             } else {
                 callback();
             }

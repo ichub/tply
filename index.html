@@ -16,22 +16,7 @@
 <body>
 <div id="template">
     <script class="config" type="application/json">
-        {
-            "types": [
-                {
-                    "name": "robot",
-                    "properties": {
-                        "data-char-interval": "0ms",
-                        "data-period-interval": "0ms",
-                        "data-comma-interval": "0ms",
-                        "data-end-interval": "0ms",
-                        "data-word-interval": "200ms"
-                    },
-                    "styleClasses": "robot",
-                    "style": "color: red;"
-                }
-            ]
-        }
+
     </script>
     <div class="container">
         <h1>
@@ -67,6 +52,23 @@
 <div id="animation">
 </div>
 
-<script>tply.animate($("#template"), $("#animation"), {});</script>
+<script>
+tply.animate($("#template"), $("#animation"), {
+    "types": [
+        {
+            "name": "robot",
+            "properties": {
+                "data-char-interval": "0ms",
+                "data-period-interval": "0ms",
+                "data-comma-interval": "0ms",
+                "data-end-interval": "0ms",
+                "data-word-interval": "200ms"
+            },
+            "styleClasses": "robot",
+            "style": "color: red;"
+        }
+    ]
+});
+</script>
 </body>
 </html>

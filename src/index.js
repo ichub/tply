@@ -225,7 +225,8 @@
     };
 
     window.tply = window.tply || {
-        animate: function(from, to, config) {
+        animate: function(from, to, conf) {
+            config = conf;
             runAnimation($(from).contents(), $(to));
         }
     }

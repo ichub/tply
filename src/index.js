@@ -166,7 +166,9 @@ $(()=> {
     };
 
     let processDefaultNode = function ($node, $root, callback) {
-        runAnimation($node.contents(), append($root, $node), callback);
+        let clone = append($root, $node);
+        clone.addClass("fadein");
+        runAnimation($node.contents(), clone, callback);
     };
 
     let processCodeNode = function ($node, $root, callback) {

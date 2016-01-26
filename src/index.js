@@ -106,6 +106,9 @@ $(()=> {
 
     let writeText = function (text, $element, callback) {
         if (text === "") {
+            if (typeof callback === "undefined") {
+                return;
+            }
             callback();
             return;
         }
@@ -113,7 +116,7 @@ $(()=> {
         let character = text[0];
 
         if (character === "\n") {
-            writeText(text.slice(1), $element);
+            writeText(text.slice(1), $element, callback);
             return;
         }
 
@@ -150,10 +153,9 @@ $(()=> {
         } else {
             if ($node[0].nodeType == NodeType.text) {
                 writeText($node.text() || $node[0].data, $root, callback);
-                return;
+            } else {
+                callback();
             }
-
-            callback();
         }
     };
 

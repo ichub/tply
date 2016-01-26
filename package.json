@@ -16,6 +16,7 @@
     "gulp-watch": "^4.3.5",
     "jshint": "^2.9.1",
     "jshint-stylish": "^2.1.0",
+    "multi-glob": "^1.0.1",
     "parse-duration": "^0.1.1"
   },
   "devDependencies": {},

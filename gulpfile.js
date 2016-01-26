@@ -7,11 +7,16 @@ let watch = require("gulp-watch");
 let babel = require('gulp-babel');
 let browserify = require('gulp-browserify');
 let jshint = require('gulp-jshint');
+let glob = require("multi-glob").glob;
+let path = require("path");
 
 let sassGlob = './sass/**/*.scss';
 let jsGlob = "./src/**/*.js";
 
-function swallowError (error) {
+let sassOutputGlob = './css/**/*.css';
+let jsOutputGlob = './dist/**/*.js';
+
+function swallowError(error) {
 
     // If you want details of the error in the console
     console.log(error.toString());
@@ -33,7 +38,7 @@ gulp.task('js', () => {
         }))
         .on('error', swallowError)
         .pipe(browserify({
-            insertGlobals : true,
+            insertGlobals: true
         }))
         .pipe(gulp.dest('dist'));
 });
@@ -46,12 +51,21 @@ gulp.task("watch", ['sass', 'js'], () => {
 gulp.task('serve', ["watch"], () => {
     gulp.src('./')
         .pipe(server({
-            livereload: true,
+            livereload: {
+                enable: true,
+                filter: function (filePath, cb) {
+                    glob([jsOutputGlob, sassOutputGlob], function (err, files) {
+                        cb(files.map(function (file) {
+                                return path.resolve(file);
+                            }).indexOf(filePath) > -1);
+                    });
+                }
+            },
             open: true
         }));
 });
 
-gulp.task('lint', function() {
+gulp.task('lint', function () {
     return gulp.src('./src/*.js')
         .pipe(jshint('.jshintrc'))
         .pipe(jshint.reporter('jshint-stylish'));

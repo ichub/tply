@@ -140,7 +140,7 @@ $(()=> {
 
             let processNextContent = function () {
                 if (index < contents.length) {
-                    processTypeNode($(contents[index++]), $root, processNextContent);
+                    processTypeNode($(contents[index++]), append($root, $node), processNextContent);
                 } else {
                     callback();
                 }

@@ -140,10 +140,11 @@ $(()=> {
 
         if (contents.length >= 1) {
             var index = 0;
+            let appendedRoot = append($root, $node);
 
             let processNextContent = function () {
                 if (index < contents.length) {
-                    processTypeNode($(contents[index++]), append($root, $node), processNextContent);
+                    processTypeNode($(contents[index++]), appendedRoot, processNextContent);
                 } else {
                     callback();
                 }
@@ -152,7 +153,7 @@ $(()=> {
             processNextContent();
         } else {
             if ($node[0].nodeType == NodeType.text) {
-                writeText(($node.text() || $node[0].data).replace(/\s\s+/g, ' '), $root, callback);
+                writeText(($node.text() || $node[0].data).replace(/\n/, '').replace(/\s\s+/g, ' '), $root, callback);
             } else {
                 callback();
             }

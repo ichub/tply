@@ -12,6 +12,7 @@ body {
   background-color: $back-color;
   font-family: $font-monospace;
   color: $text-color;
+  line-height: 1.5em;
 }
 
 #template {
@@ -41,8 +42,6 @@ body {
 }
 
 p {
-  text-indent: 30px;
-  line-height: 1.5em;
 }
 
 .character {

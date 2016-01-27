@@ -68,10 +68,6 @@
         processing: [
             {
                 tag: "code",
-                pre: function(element) {
-                    console.log("pre");
-                    console.log(element);
-                },
                 post: function(element) {
                     hljs.highlightBlock(element);
                 }

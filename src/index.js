@@ -82,7 +82,7 @@
         let duration = parseDuration($node.text());
 
         setTimeout(function () {
-            callback($node[0]);
+            callback(null);
         }, duration);
     };
 
@@ -129,7 +129,7 @@
             if (typeof callback === "undefined") {
                 return;
             }
-            callback($element[0]);
+            callback(null);
             return;
         }
 
@@ -167,7 +167,7 @@
                 if (index < contents.length) {
                     processTypeNode($(contents[index++]), appendedRoot, processNextContent, $topLevelTypeNode);
                 } else {
-                    callback($node[0]);
+                    callback(null);
                 }
             };
 
@@ -176,16 +176,16 @@
             if ($node[0].nodeType == NodeType.text) {
                 writeText(($node.text() || $node[0].data).replace(/\n/, '').replace(/\s\s+/g, ' '), $topLevelTypeNode, $root, callback);
             } else {
-                callback($node[0]);
+                callback(null);
             }
         }
     };
 
-    let processDefaultNode = function ($node, $root, callback) {
+    let processDefaultNode = makeProcessor(function ($node, $root, callback) {
         let clone = append($root, $node);
         clone.addClass("fadein");
-        runAnimation($node.contents(), clone, callback);
-    };
+        runAnimation($node[0], $node.contents(), clone, callback);
+    });
 
     let processors = {
         "type": makeProcessor(processTypeNode),
@@ -206,30 +206,30 @@
         } else if ($node[0].nodeType === NodeType.text) {
             $root.append($node.text());
             scrollDown();
-            callback($node[0]);
+            callback(null);
         } else {
             scrollDown();
-            callback($node[0]);
+            callback(null);
         }
     };
 
-    let runAnimation = function (nodes, $root, callback = () => {
+    let runAnimation = function (parent, nodes, $root, callback = () => {
     }) {
         if (nodes.length === 0) {
-            callback();
+            callback(parent);
             return;
         }
 
         var index = 0;
 
-        let animateRemainingNodes = function () {
+        let animateRemainingNodes = function (node) {
             index++;
 
             if (index < nodes.length) {
                 processNode($(nodes[index]).clone(), $root, animateRemainingNodes);
             }
             else {
-                callback();
+                callback($root[0]);
             }
         };
 
@@ -239,7 +239,7 @@
     window.tply = window.tply || {
             animate: function (from, to, conf) {
                 config = conf;
-                runAnimation($(from).contents(), $(to));
+                runAnimation($(from)[0], $(from).contents(), $(to));
             }
         }
 })();

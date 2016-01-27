@@ -27,19 +27,19 @@
                 }
             }
 
-            for (var i = 0; i < config.processing.length; i++) {
-                let proc = config.processing[i];
+            for (var k = 0; k < config.processing.length; k++) {
+                let proc = config.processing[k];
 
-                if (node.tagName.toLowerCase() == proc.tag.toLowerCase()) {
+                if (node.tagName.toLowerCase() === proc.tag.toLowerCase()) {
                     if (typeof proc.pre === "function") {
                         proc.pre(node);
                     }
 
                     if (typeof proc.post === "function") {
-                        callBackProxy = function(element) {
+                        callBackProxy = function (element) {
                             proc.post(element);
                             callback(element);
-                        }
+                        };
                     }
                 }
             }
@@ -173,7 +173,7 @@
 
             processNextContent();
         } else {
-            if (node.nodeType == NodeType.text) {
+            if (node.nodeType === NodeType.text) {
                 writeText((node.innerText || node.data).replace(/\n/, '').replace(/\s\s+/g, ' '), topLevelTypeNode, root, callback);
             } else {
                 callback(null);
@@ -222,7 +222,7 @@
 
         var index = 0;
 
-        let animateRemainingNodes = function (node) {
+        let animateRemainingNodes = function () {
             index++;
 
             if (index < nodes.length) {
@@ -241,5 +241,5 @@
                 config = conf;
                 runAnimation(from, from.childNodes, to);
             }
-        }
+        };
 })();

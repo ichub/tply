@@ -39,36 +39,49 @@
             </p>
         </type>
         <pre><code class="javascript">if (isEnd) {
-    return endInterval;
-} else if (char === "." || char === "?" || char === "!") {
-    return Math.max(charInterval, periodInterval);
-} else if (char === " ") {
-    return Math.max(wordInterval, charInterval);
-} else if (char === ",") {
-    return Math.max(charInterval, commaInterval);
-}</code></pre>
+            return endInterval;
+            } else if (char === "." || char === "?" || char === "!") {
+            return Math.max(charInterval, periodInterval);
+            } else if (char === " ") {
+            return Math.max(wordInterval, charInterval);
+            } else if (char === ",") {
+            return Math.max(charInterval, commaInterval);
+            }</code></pre>
     </div>
 </div>
 <div id="animation">
 </div>
 
 <script>
-tply.animate($("#template"), $("#animation"), {
-    "types": [
-        {
-            "name": "robot",
-            "properties": {
-                "data-char-interval": "0ms",
-                "data-period-interval": "0ms",
-                "data-comma-interval": "0ms",
-                "data-end-interval": "0ms",
-                "data-word-interval": "200ms"
-            },
-            "styleClasses": "robot",
-            "style": "color: red;"
-        }
-    ]
-});
+    tply.animate($("#template"), $("#animation"), {
+        types: [
+            {
+                name: "robot",
+                properties: {
+                    "data-char-interval": "0ms",
+                    "data-period-interval": "0ms",
+                    "data-comma-interval": "0ms",
+                    "data-end-interval": "0ms",
+                    "data-word-interval": "200ms"
+                },
+                styleClasses: "robot",
+                style: "color: red;"
+            }
+        ],
+        processing: [
+            {
+                tag: "code",
+                pre: function(element) {
+                    console.log("pre");
+                    console.log(element);
+                },
+                post: function(element) {
+                    console.log("post");
+                    console.log(element);
+                }
+            }
+        ]
+    });
 </script>
 </body>
 </html>

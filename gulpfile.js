@@ -48,7 +48,7 @@ gulp.task('js', () => {
         }))
         .on('error', swallowError)
         .pipe(browserify({
-            insertGlobals: true
+            insertGlobals: false
         }))
         .pipe(gulpif(options.production, uglify()))
         .pipe(gulp.dest('dist'));

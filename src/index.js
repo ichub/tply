@@ -82,7 +82,7 @@
         let duration = parseDuration($node.text());
 
         setTimeout(function () {
-            callback();
+            callback($node[0]);
         }, duration);
     };
 
@@ -129,7 +129,7 @@
             if (typeof callback === "undefined") {
                 return;
             }
-            callback();
+            callback($element[0]);
             return;
         }
 
@@ -167,7 +167,7 @@
                 if (index < contents.length) {
                     processTypeNode($(contents[index++]), appendedRoot, processNextContent, $topLevelTypeNode);
                 } else {
-                    callback();
+                    callback($node[0]);
                 }
             };
 
@@ -176,7 +176,7 @@
             if ($node[0].nodeType == NodeType.text) {
                 writeText(($node.text() || $node[0].data).replace(/\n/, '').replace(/\s\s+/g, ' '), $topLevelTypeNode, $root, callback);
             } else {
-                callback();
+                callback($node[0]);
             }
         }
     };
@@ -190,7 +190,7 @@
     let processCodeNode = function ($node, $root, callback) {
         let clone = append($root, $node, "code", true);
         hljs.highlightBlock(clone[0]);
-        callback();
+        callback($node[0]);
     };
 
     let processors = {
@@ -213,10 +213,10 @@
         } else if ($node[0].nodeType === NodeType.text) {
             $root.append($node.text());
             scrollDown();
-            callback();
+            callback($node[0]);
         } else {
             scrollDown();
-            callback();
+            callback($node[0]);
         }
     };
 

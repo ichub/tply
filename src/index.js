@@ -1,4 +1,4 @@
-/* globals $, require */
+/* globals require */
 
 (function () {
     "use strict";
@@ -7,22 +7,21 @@
     var config = {types: []};
 
     var makeProcessor = function (processFn) {
-        return function ($node, $root, callback) {
-            var rawNode = $node[0];
+        return function (node, root, callback) {
             var callBackProxy = callback;
 
-            for (var i = 0; i < rawNode.attributes.length; i++) {
+            for (var i = 0; i < node.attributes.length; i++) {
                 for (var j = 0; j < config.types.length; j++) {
-                    if (rawNode.attributes[i].name === "data-type") {
-                        if (rawNode.attributes[i].value === config.types[j].name) {
+                    if (node.attributes[i].name === "data-type") {
+                        if (node.attributes[i].value === config.types[j].name) {
                             for (var propName in config.types[j].properties) {
                                 if (config.types[j].properties.hasOwnProperty(propName)) {
-                                    $node.attr(propName, config.types[j].properties[propName]);
+                                    node.setAttribute(propName, config.types[j].properties[propName]);
                                 }
                             }
 
-                            $node.addClass(config.types[j].styleClasses || "");
-                            $node.attr("style", $node.attr("style") + ";" + config.types[j].style);
+                            node.classList.add(config.types[j].styleClasses || "");
+                            node.setAttribute("style", node.getAttribute("style") + ";" + config.types[j].style);
                         }
                     }
                 }
@@ -31,9 +30,9 @@
             for (var i = 0; i < config.processing.length; i++) {
                 let proc = config.processing[i];
 
-                if ($node.prop("tagName").toLowerCase() == proc.tag.toLowerCase()) {
+                if (node.tagName.toLowerCase() == proc.tag.toLowerCase()) {
                     if (typeof proc.pre === "function") {
-                        proc.pre(rawNode);
+                        proc.pre(node);
                     }
 
                     if (typeof proc.post === "function") {
@@ -45,14 +44,14 @@
                 }
             }
 
-            processFn($node, $root, callBackProxy);
+            processFn(node, root, callBackProxy);
         };
     };
 
-    let append = function ($root, $node, desiredTag, justCopyIt) {
+    let append = function (root, node, desiredTag, justCopyIt) {
         justCopyIt = justCopyIt || false;
 
-        var clone = $node[0].cloneNode(true);
+        var clone = node.cloneNode(true);
         if (!justCopyIt) {
             clone.innerHTML = "";
         }
@@ -63,15 +62,15 @@
             clone.innerHTML = clonedInnerHtml;
 
 
-            $node[0].attributes.forEach(function (attr) {
+            node.attributes.forEach(function (attr) {
                 clone.setAttribute(attr.name, attr.value);
             });
 
-            clone.className = $node[0].className;
+            clone.className = node.className;
         }
 
-        $root[0].appendChild(clone);
-        return $(clone);
+        root.appendChild(clone);
+        return clone;
     };
 
     let NodeType = {
@@ -81,8 +80,8 @@
         comment: 8
     };
 
-    let processWaitNode = function ($node, $root, callback) {
-        let duration = parseDuration($node[0].innerText);
+    let processWaitNode = function (node, root, callback) {
+        let duration = parseDuration(node.innerText);
 
         setTimeout(function () {
             callback(null);
@@ -127,7 +126,7 @@
         return charInterval;
     };
 
-    let writeText = function (text, $typeNode, $element, callback) {
+    let writeText = function (text, typeNode, element, callback) {
         if (text === "") {
             if (typeof callback === "undefined") {
                 return;
@@ -136,41 +135,37 @@
             return;
         }
 
-        let character = text[0];
+        let char = text[0];
 
-        if (character === "\n") {
-            writeText(text.slice(1), $element, callback);
-            return;
-        }
         let character = document.createElement("span");
-        character.classList.push("character");
-        character.innerText = character;
-        $element[0].appendChild(character);
+        character.classList.add("character");
+        character.innerText = char;
+        element.appendChild(character);
 
-        let interval = mapCharToInteval($typeNode, character, text.length === 1);
+        let interval = mapCharToInteval(typeNode, char, text.length === 1);
 
         if (interval === 0) {
-            writeText(text.slice(1), $typeNode, $element, callback);
+            writeText(text.slice(1), typeNode, element, callback);
             scrollDown();
         } else {
             setTimeout(function () {
-                writeText(text.slice(1), $typeNode, $element, callback);
+                writeText(text.slice(1), typeNode, element, callback);
                 scrollDown();
             }, interval);
         }
     };
 
-    let processTypeNode = function ($node, $root, callback, $topLevelTypeNode) {
-        $topLevelTypeNode = $topLevelTypeNode || $node;
-        let contents = $node.contents();
+    let processTypeNode = function (node, root, callback, topLevelTypeNode) {
+        topLevelTypeNode = topLevelTypeNode || node;
+        let contents = node.childNodes;
 
         if (contents.length >= 1) {
             var index = 0;
-            let appendedRoot = append($root, $node);
+            let appendedRoot = append(root, node);
 
             let processNextContent = function () {
                 if (index < contents.length) {
-                    processTypeNode($(contents[index++]), appendedRoot, processNextContent, $topLevelTypeNode);
+                    processTypeNode(contents[index++], appendedRoot, processNextContent, topLevelTypeNode);
                 } else {
                     callback(null);
                 }
@@ -178,18 +173,18 @@
 
             processNextContent();
         } else {
-            if ($node[0].nodeType == NodeType.text) {
-                writeText(($node.text() || $node[0].data).replace(/\n/, '').replace(/\s\s+/g, ' '), $topLevelTypeNode, $root, callback);
+            if (node.nodeType == NodeType.text) {
+                writeText((node.innerText || node.data).replace(/\n/, '').replace(/\s\s+/g, ' '), topLevelTypeNode, root, callback);
             } else {
                 callback(null);
             }
         }
     };
 
-    let processDefaultNode = makeProcessor(function ($node, $root, callback) {
-        let clone = append($root, $node);
-        clone.addClass("fadein");
-        runAnimation($node[0], $node.contents(), clone, callback);
+    let processDefaultNode = makeProcessor(function (node, root, callback) {
+        let clone = append(root, node);
+        clone.classList.add("fadein");
+        runAnimation(node, node.childNodes, clone, callback);
     });
 
     let processors = {
@@ -197,19 +192,19 @@
         "wait": makeProcessor(processWaitNode),
     };
 
-    let processNode = function ($node, $root, callback) {
-        if ($node[0].nodeType === NodeType.element) {
-            let tag = $node.prop("tagName").toLowerCase();
+    let processNode = function (node, root, callback) {
+        if (node.nodeType === NodeType.element) {
+            let tag = node.tagName.toLowerCase();
 
             let matchingProcessor = processors[tag];
 
             if (typeof matchingProcessor !== "undefined") {
-                matchingProcessor($node, $root, callback);
+                matchingProcessor(node, root, callback);
             } else {
-                processDefaultNode($node, $root, callback);
+                processDefaultNode(node, root, callback);
             }
-        } else if ($node[0].nodeType === NodeType.text) {
-            $root.append($node.text());
+        } else if (node.nodeType === NodeType.text) {
+            root.appendChild(document.createTextNode(node.data));
             scrollDown();
             callback(null);
         } else {
@@ -218,7 +213,7 @@
         }
     };
 
-    let runAnimation = function (parent, nodes, $root, callback = () => {
+    let runAnimation = function (parent, nodes, root, callback = () => {
     }) {
         if (nodes.length === 0) {
             callback(parent);
@@ -231,20 +226,20 @@
             index++;
 
             if (index < nodes.length) {
-                processNode($(nodes[index]).clone(), $root, animateRemainingNodes);
+                processNode(nodes[index].cloneNode(true), root, animateRemainingNodes);
             }
             else {
-                callback($root[0]);
+                callback(root);
             }
         };
 
-        processNode($(nodes[index]).clone(), $root, animateRemainingNodes);
+        processNode(nodes[index].cloneNode(true), root, animateRemainingNodes);
     };
 
     window.tply = window.tply || {
             animate: function (from, to, conf) {
                 config = conf;
-                runAnimation(from, $(from).contents(), $(to));
+                runAnimation(from, from.childNodes, to);
             }
         }
 })();

@@ -1,5 +1,3 @@
-/* globals require */
-
 (function () {
     "use strict";
     let parseDuration = require("parse-duration");

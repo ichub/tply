@@ -76,8 +76,8 @@
                     console.log(element);
                 },
                 post: function(element) {
-                    console.log("post");
-                    console.log(element);
+                    hljs.highlightBlock(element);
+                    element.style.backgroundColor = "red";
                 }
             }
         ]

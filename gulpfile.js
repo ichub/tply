@@ -12,6 +12,7 @@ let path = require("path");
 let commandLineArgs = require('command-line-args');
 let gulpif = require('gulp-if');
 let uglify = require('gulp-uglify');
+let cssnano = require('gulp-cssnano');
 
 let cli = commandLineArgs([
     { name: 'production', alias: 'p', type: Boolean, defaultOption: false}
@@ -37,6 +38,7 @@ function swallowError(error) {
 gulp.task('sass', () => {
     gulp.src(sassGlob)
         .pipe(sass().on('error', sass.logError))
+        .pipe(gulpif(options.production, cssnano()))
         .pipe(gulp.dest('./css'));
 });
 

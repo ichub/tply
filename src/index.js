@@ -1,17 +1,20 @@
 /* globals $, require */
 
-(function() {
+(function () {
     "use strict";
     let parseDuration = require("parse-duration");
 
-    var config = {types:[]};
+    var config = {types: []};
 
     var makeProcessor = function (processFn) {
         return function ($node, $root, callback) {
-            for (var i = 0; i < $node[0].attributes.length; i++) {
+            var rawNode = $node[0];
+            var callBackProxy = callback;
+
+            for (var i = 0; i < rawNode.attributes.length; i++) {
                 for (var j = 0; j < config.types.length; j++) {
-                    if ($node[0].attributes[i].name === "data-type") {
-                        if ($node[0].attributes[i].value === config.types[j].name) {
+                    if (rawNode.attributes[i].name === "data-type") {
+                        if (rawNode.attributes[i].value === config.types[j].name) {
                             for (var propName in config.types[j].properties) {
                                 if (config.types[j].properties.hasOwnProperty(propName)) {
                                     $node.attr(propName, config.types[j].properties[propName]);
@@ -20,13 +23,29 @@
 
                             $node.addClass(config.types[j].styleClasses || "");
                             $node.attr("style", $node.attr("style") + ";" + config.types[j].style);
-                            processFn($node, $root, callback);
-                            return;
                         }
                     }
                 }
             }
-            processFn($node, $root, callback);
+
+            for (var i = 0; i < config.processing.length; i++) {
+                let proc = config.processing[i];
+
+                if ($node.prop("tagName").toLowerCase() == proc.tag.toLowerCase()) {
+                    if (typeof proc.pre === "function") {
+                        proc.pre(rawNode);
+                    }
+
+                    if (typeof proc.post === "function") {
+                        callBackProxy = function(element) {
+                            proc.post(element);
+                            callback(element);
+                        }
+                    }
+                }
+            }
+
+            processFn($node, $root, callBackProxy);
         };
     };
 
@@ -225,9 +244,9 @@
     };
 
     window.tply = window.tply || {
-        animate: function(from, to, conf) {
-            config = conf;
-            runAnimation($(from).contents(), $(to));
+            animate: function (from, to, conf) {
+                config = conf;
+                runAnimation($(from).contents(), $(to));
+            }
         }
-    }
 })();

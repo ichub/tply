@@ -187,16 +187,9 @@
         runAnimation($node.contents(), clone, callback);
     };
 
-    let processCodeNode = function ($node, $root, callback) {
-        let clone = append($root, $node, "code", true);
-        hljs.highlightBlock(clone[0]);
-        callback($node[0]);
-    };
-
     let processors = {
         "type": makeProcessor(processTypeNode),
         "wait": makeProcessor(processWaitNode),
-        "code": makeProcessor(processCodeNode)
     };
 
     let processNode = function ($node, $root, callback) {

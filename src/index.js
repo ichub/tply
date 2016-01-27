@@ -82,7 +82,7 @@
     };
 
     let processWaitNode = function ($node, $root, callback) {
-        let duration = parseDuration($node.text());
+        let duration = parseDuration($node[0].innerText);
 
         setTimeout(function () {
             callback(null);
@@ -93,20 +93,20 @@
         window.scroll(0, document.documentElement.offsetHeight);
     };
 
-    let mapCharToInteval = function ($node, char, isEnd) {
+    let mapCharToInteval = function (node, char, isEnd) {
         let defaultCharInterval = "50ms";
         let defaultPeriodInterval = "500ms";
         let defaultCommaInterval = "300ms";
         let defaultEndInterval = "0ms";
         let defaultWordInterval = "0ms";
 
-        let charInterval = parseDuration($node.attr("data-char-interval") || defaultCharInterval);
-        let periodInterval = parseDuration($node.attr("data-period-interval") || defaultPeriodInterval);
-        let commaInterval = parseDuration($node.attr("data-comma-interval") || defaultCommaInterval);
-        let endInterval = parseDuration($node.attr("data-end-interval") || defaultEndInterval);
-        let wordInterval = parseDuration($node.attr("data-word-interval") || defaultWordInterval);
+        let charInterval = parseDuration(node.getAttribute("data-char-interval") || defaultCharInterval);
+        let periodInterval = parseDuration(node.getAttribute("data-period-interval") || defaultPeriodInterval);
+        let commaInterval = parseDuration(node.getAttribute("data-comma-interval") || defaultCommaInterval);
+        let endInterval = parseDuration(node.getAttribute("data-end-interval") || defaultEndInterval);
+        let wordInterval = parseDuration(node.getAttribute("data-word-interval") || defaultWordInterval);
 
-        if ($node.attr("data-robot")) {
+        if (node.getAttribute("data-robot")) {
             charInterval = 0;
             periodInterval = 0;
             commaInterval = 0;
@@ -142,8 +142,10 @@
             writeText(text.slice(1), $element, callback);
             return;
         }
-
-        $element.append(`<span class="character">${character}</span>`);
+        let character = document.createElement("span");
+        character.classList.push("character");
+        character.innerText = character;
+        $element[0].appendChild(character);
 
         let interval = mapCharToInteval($typeNode, character, text.length === 1);
 

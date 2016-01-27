@@ -52,23 +52,26 @@
     let append = function ($root, $node, desiredTag, justCopyIt) {
         justCopyIt = justCopyIt || false;
 
-        var clone = $node.clone();
+        var clone = $node[0].cloneNode(true);
         if (!justCopyIt) {
-            clone.html("");
+            clone.innerHTML = "";
         }
 
         if (typeof desiredTag !== 'undefined') {
-            clone = $(`<${desiredTag}>${clone.html()}</${desiredTag}>`);
+            var clonedInnerHtml = clone.innerHTML;
+            clone = document.createElement(desiredTag);
+            clone.innerHTML = clonedInnerHtml;
 
-            $.each($node.prop("attributes"), function () {
-                clone.attr(this.name, this.value);
+
+            $node[0].attributes.forEach(function (attr) {
+                clone.setAttribute(attr.name, attr.value);
             });
 
-            clone.className = $node.className;
+            clone.className = $node[0].className;
         }
 
-        $root.append(clone);
-        return clone;
+        $root[0].appendChild(clone);
+        return $(clone);
     };
 
     let NodeType = {
@@ -239,7 +242,7 @@
     window.tply = window.tply || {
             animate: function (from, to, conf) {
                 config = conf;
-                runAnimation($(from)[0], $(from).contents(), $(to));
+                runAnimation(from, $(from).contents(), $(to));
             }
         }
 })();

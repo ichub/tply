@@ -83,3 +83,5 @@ gulp.task('lint', function () {
         .pipe(jshint('.jshintrc'))
         .pipe(jshint.reporter('jshint-stylish'));
 });
+
+gulp.task('default', ['serve']);

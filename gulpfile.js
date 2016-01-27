@@ -9,6 +9,15 @@ let browserify = require('gulp-browserify');
 let jshint = require('gulp-jshint');
 let glob = require("multi-glob").glob;
 let path = require("path");
+let commandLineArgs = require('command-line-args');
+let gulpif = require('gulp-if');
+let uglify = require('gulp-uglify');
+
+let cli = commandLineArgs([
+    { name: 'production', alias: 'p', type: Boolean, defaultOption: false}
+]);
+
+let options = cli.parse();
 
 let sassGlob = './sass/**/*.scss';
 let jsGlob = "./src/**/*.js";
@@ -41,6 +50,7 @@ gulp.task('js', () => {
         .pipe(browserify({
             insertGlobals: true
         }))
+        .pipe(gulpif(options.production, uglify()))
         .pipe(gulp.dest('dist'));
 });
 

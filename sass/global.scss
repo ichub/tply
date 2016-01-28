@@ -16,7 +16,7 @@ body {
 }
 
 #template {
-  display: none;
+  display: initial;
 }
 
 #animation {
@@ -73,4 +73,27 @@ code {
   border-radius: 2px;
   overflow: hidden;
   font-family: $font-monospace;
+}
+
+.gallery {
+  min-height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-direction: row;
+
+  $margin: 20px;
+  padding-top: $margin;
+
+  .section {
+    background-color: #d8d8d8;
+    min-height: 300px;
+    min-width: 250px;
+    width: 40%;
+
+    margin-bottom: $margin;
+    margin-left: $margin / 2;
+    margin-right: $margin / 2;
+  }
 }

@@ -87,6 +87,7 @@
     };
 
     let scrollDown = function () {
+        return;
         window.scroll(0, document.documentElement.offsetHeight);
     };
 

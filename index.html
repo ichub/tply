@@ -40,6 +40,10 @@
 
         <div class="gallery">
             <div class="section">
+                <div class="tply-container">
+                    <div class="tply-template">asdf</div>
+                    <div class="tply-animation"></div>
+                </div>
                 <div class="cover"><span class="description">write text with styles</span></div>
             </div>
             <div class="section">
@@ -58,6 +62,25 @@
 </div>
 
 <script>
+    "use strict";
+
+    let covers = document.querySelectorAll(".cover");
+
+    for (var i = 0; i < covers.length; i++) {
+        let cover = covers[i];
+
+        cover.addEventListener("click", function(e) {
+            cover.classList.add("hidden");
+
+            var container = cover.parentElement;
+
+            var template = container.querySelector(".tply-template");
+            var animation = container.querySelector(".tply-animation");
+
+            tply.animate(template, animation);
+        });
+    }
+
     tply.animate(document.getElementById("template"), document.getElementById("animation"), {
         types: [
             {

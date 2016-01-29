@@ -63,6 +63,15 @@ p {
   }
 }
 
+@keyframes cover-go-away {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 .fadein {
   animation-name: fadein;
   animation-duration: 300ms;
@@ -97,6 +106,12 @@ code {
     margin-left: $margin / 2;
     margin-right: $margin / 2;
 
+    .tply-container {
+      .tply-template {
+        display: none;
+      }
+    }
+
     .cover {
       position: absolute;
       background-color: rgba(0, 0, 0, 0.15);
@@ -108,6 +123,12 @@ code {
 
       .description {
         font-weight: bold;
+      }
+
+      &.hidden {
+        animation-name: cover-go-away;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
       }
 
       &:hover {

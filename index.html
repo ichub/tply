@@ -78,7 +78,10 @@
             var animation = container.querySelector(".tply-animation");
 
             tply.animate(template, animation, {}, function() {
-                alert();
+                setTimeout(function() {
+                    cover.classList.remove("hidden");
+                    animation.innerHTML = "";
+                }, 200);
             });
         });
     }

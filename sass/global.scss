@@ -63,15 +63,6 @@ p {
   }
 }
 
-@keyframes cover-go-away {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
 .fadein {
   animation-name: fadein;
   animation-duration: 300ms;
@@ -97,7 +88,7 @@ code {
 
   .section {
     position: relative;
-    background-color: #d8d8d8;
+    background-color: #80d889;
     min-height: 250px;
     min-width: 350px;
     width: 40%;
@@ -107,32 +98,35 @@ code {
     margin-right: $margin / 2;
 
     .tply-container {
+      z-index: 1;
+      position: absolute;
+
       .tply-template {
         display: none;
       }
     }
 
     .cover {
+      z-index: 2;
       position: absolute;
-      background-color: rgba(0, 0, 0, 0.15);
+      background-color: rgb(223, 223, 223);
       width: 100%;
       height: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
+      transition: opacity 200ms;
 
       .description {
         font-weight: bold;
       }
 
       &.hidden {
-        animation-name: cover-go-away;
-        animation-duration: 200ms;
-        animation-fill-mode: forwards;
+        opacity: 0;
       }
 
       &:hover {
-        background-color: rgba(0, 0, 0, 0.1);
+        background-color: rgb(197, 197, 197);
         cursor: pointer;
 
         .description {

@@ -61,7 +61,7 @@
             clone.innerHTML = "";
         }
 
-        if (typeof desiredTag !== 'undefined') {
+        if (typeof desiredTag !== 'undefined' && desiredTag !== null) {
             var clonedInnerHtml = clone.innerHTML;
             clone = document.createElement(desiredTag);
             clone.innerHTML = clonedInnerHtml;
@@ -188,9 +188,17 @@
     };
 
     let processDefaultNode = makeProcessor(function (node, root, callback) {
-        let clone = append(root, node);
-        clone.classList.add("fadein");
-        runAnimation(node, node.childNodes, clone, callback);
+        var clone;
+
+        if (node.getAttribute("data-ignore-tply") === "true") {
+            clone = append(root, node, null, true);
+            clone.classList.add("fadein");
+            callback(clone);
+        } else {
+            clone = append(root, node);
+            clone.classList.add("fadein");
+            runAnimation(node, node.childNodes, clone, callback);
+        }
     });
 
     let processors = {

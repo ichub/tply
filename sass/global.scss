@@ -3,14 +3,14 @@ $text-color: rgb(40, 40, 40);
 $content-width: 1000px;
 $max-content-width: 80vw;
 $font-monospace: 'Inconsolata', monospace;
-$font-normal: 'Arvo', serif;
+$font-normal: 'Open Sans', sans-serif;
 
 $accent-blue: rgb(50, 38, 197);
 $accent-2: rgb(148, 64, 114);
 
 body {
   background-color: $back-color;
-  font-family: $font-monospace;
+  font-family: $font-normal;
   color: $text-color;
   line-height: 1.5em;
 }
@@ -92,6 +92,7 @@ code {
     min-height: 250px;
     min-width: 350px;
     width: 40%;
+    border-radius: 2px;
 
     margin-bottom: $margin;
     margin-left: $margin / 2;

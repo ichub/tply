@@ -41,7 +41,9 @@
         <div class="gallery" data-ignore-tply="true">
             <div class="section">
                 <div class="tply-container">
-                    <div class="tply-template">asdf <wait>1s</wait></div>
+                    <div class="tply-template">
+                        <type>Now we're cooking!</type>
+                    </div>
                     <div class="tply-animation"></div>
                 </div>
                 <div class="cover"><span class="description">write text with styles</span></div>
@@ -65,24 +67,46 @@
     "use strict";
 
     let covers = document.querySelectorAll(".cover");
+    let transitionDuration = 200;
 
     for (var i = 0; i < covers.length; i++) {
         let cover = covers[i];
 
-        cover.addEventListener("click", function(e) {
-            cover.classList.add("hidden");
+        let section = cover.parentElement;
+        let template = section.querySelector(".tply-template");
+        let animation = section.querySelector(".tply-animation");
 
-            var container = cover.parentElement;
-
-            var template = container.querySelector(".tply-template");
-            var animation = container.querySelector(".tply-animation");
-
-            tply.animate(template, animation, {}, function() {
-                setTimeout(function() {
+        let reset = function () {
+            if (cover.classList.contains("hidden")) {
+                setTimeout(function () {
                     cover.classList.remove("hidden");
                     animation.innerHTML = "";
-                }, 200);
-            });
+                }, transitionDuration);
+            }
+        };
+
+        cover.addEventListener("click", function (e) {
+            cover.classList.add("hidden");
+
+
+            setTimeout(function () {
+                tply.animate(template, animation, {}, function () {
+                });
+            }, transitionDuration);
+        });
+
+        section.addEventListener("mouseout", function (e) {
+            e = event.toElement || event.relatedTarget;
+
+            while (e && e.parentNode && e.parentNode != window) {
+                if (e.parentNode == this || e == this) {
+                    if (e.preventDefault) e.preventDefault();
+                    return false;
+                }
+                e = e.parentNode;
+            }
+
+            reset();
         });
     }
 

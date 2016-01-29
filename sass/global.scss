@@ -104,6 +104,9 @@ code {
       .tply-template {
         display: none;
       }
+      .tply-animation {
+        padding: 40px;
+      }
     }
 
     .cover {
@@ -123,6 +126,7 @@ code {
 
       &.hidden {
         opacity: 0;
+        visibility: hidden;
       }
 
       &:hover {

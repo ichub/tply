@@ -109,9 +109,18 @@
     "use strict";
 
     let covers = document.querySelectorAll(".cover");
-    let transitionDuration = 200;
+    let transitionInDuration = 200;
+    let transitionOutDuration = 500;
 
-    for (var i = 0; i < covers.length; i++) {
+    let isDone = Array.apply(null, new Array(covers.length)).map(function() {
+        return true;
+    });
+
+    let mouseIn = isDone.map(function () {
+        return false;
+    });
+
+    for (let i = 0; i < covers.length; i++) {
         let cover = covers[i];
 
         let section = cover.parentElement;
@@ -123,21 +132,33 @@
                 setTimeout(function () {
                     cover.classList.remove("hidden");
                     animation.innerHTML = "";
-                }, transitionDuration);
+                }, transitionOutDuration);
             }
         };
 
         cover.addEventListener("click", function (e) {
-            cover.classList.add("hidden");
+            isDone[i] = false;
 
+            cover.classList.add("hidden");
 
             setTimeout(function () {
                 tply.animate(template, animation, {}, function () {
+                    isDone[i] = true;
+
+                    if (!mouseIn[i]) {
+                        reset();
+                    }
                 });
-            }, transitionDuration);
+            }, transitionInDuration);
+        });
+
+        section.addEventListener("mouseover", function (e) {
+            mouseIn[i] = true;
         });
 
         section.addEventListener("mouseout", function (e) {
+            mouseIn[i] = false;
+
             e = event.toElement || event.relatedTarget;
 
             while (e && e.parentNode && e.parentNode != window) {
@@ -148,7 +169,9 @@
                 e = e.parentNode;
             }
 
-            reset();
+            if (isDone[i]) {
+                reset();
+            }
         });
     }
 

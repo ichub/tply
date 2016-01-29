@@ -9,6 +9,10 @@
             var callBackProxy = callback;
 
             for (var i = 0; i < node.attributes.length; i++) {
+                if (typeof !Array.isArray(config.types)) {
+                    break;
+                }
+
                 for (var j = 0; j < config.types.length; j++) {
                     if (node.attributes[i].name === "data-type") {
                         if (node.attributes[i].value === config.types[j].name) {
@@ -25,19 +29,22 @@
                 }
             }
 
-            for (var k = 0; k < config.processing.length; k++) {
-                let proc = config.processing[k];
+            if (Array.isArray(config.processing)) {
 
-                if (node.tagName.toLowerCase() === proc.tag.toLowerCase()) {
-                    if (typeof proc.pre === "function") {
-                        proc.pre(node);
-                    }
+                for (var k = 0; k < config.processing.length; k++) {
+                    let proc = config.processing[k];
 
-                    if (typeof proc.post === "function") {
-                        callBackProxy = function (element) {
-                            proc.post(element);
-                            callback(element);
-                        };
+                    if (node.tagName.toLowerCase() === proc.tag.toLowerCase()) {
+                        if (typeof proc.pre === "function") {
+                            proc.pre(node);
+                        }
+
+                        if (typeof proc.post === "function") {
+                            callBackProxy = function (element) {
+                                proc.post(element);
+                                callback(element);
+                            };
+                        }
                     }
                 }
             }
@@ -236,9 +243,9 @@
     };
 
     window.tply = window.tply || {
-            animate: function (from, to, conf) {
+            animate: function (from, to, conf, callback) {
                 config = conf;
-                runAnimation(from, from.childNodes, to);
+                runAnimation(from, from.childNodes, to, callback);
             }
         };
 })();

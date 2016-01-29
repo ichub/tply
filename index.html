@@ -41,7 +41,7 @@
         <div class="gallery">
             <div class="section">
                 <div class="tply-container">
-                    <div class="tply-template">asdf</div>
+                    <div class="tply-template">asdf <wait>1s</wait></div>
                     <div class="tply-animation"></div>
                 </div>
                 <div class="cover"><span class="description">write text with styles</span></div>
@@ -77,7 +77,9 @@
             var template = container.querySelector(".tply-template");
             var animation = container.querySelector(".tply-animation");
 
-            tply.animate(template, animation);
+            tply.animate(template, animation, {}, function() {
+                alert();
+            });
         });
     }
 

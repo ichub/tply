@@ -14,6 +14,8 @@ let cssnano = require('gulp-cssnano');
 let ts = require('gulp-typescript');
 let merge = require('merge2');
 let tslint = require("gulp-tslint");
+let tsfmt = require("gulp-tsfmt");
+let changedInPlace = require("gulp-changed-in-place");
 
 let cli = commandLineArgs([
     { name: 'production', alias: 'p', type: Boolean, defaultOption: false}
@@ -90,6 +92,15 @@ gulp.task('lint', function () {
         .pipe(tslint.report("prose", {
             emitError: false
         }))
+});
+
+gulp.task('format', () => {
+    gulp.src('src/**/*.ts')
+        .pipe(changedInPlace())
+        .pipe(tsfmt({ options: {
+            
+        }))
+        .pipe(gulp.dest(file => path.dirname(file.path)));
 });
 
 gulp.task('default', ['serve']);

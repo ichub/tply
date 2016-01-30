@@ -258,6 +258,11 @@
             return;
         }
 
+        if (cancellation.isCancelled) {
+            cancellation.onCancel();
+            return;
+        }
+
         element.appendChild(createCharacterElement(text[0]));
 
         let interval = mapCharToInterval(config, typeNode, text[0], text.length === 1);

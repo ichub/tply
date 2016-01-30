@@ -161,7 +161,7 @@
         window.scroll(0, document.documentElement.offsetHeight);
     };
 
-    let mapCharToInteval = function (config:Configuration, node:HTMLElement, char:string, isEnd:boolean):number {
+    let mapCharToInterval = function (config:Configuration, node:HTMLElement, char:string, isEnd:boolean):number {
         let defaultCharInterval = "50ms";
         let defaultPeriodInterval = "500ms";
         let defaultCommaInterval = "300ms";
@@ -215,7 +215,7 @@
 
         element.appendChild(createCharacterElement(text[0]));
 
-        let interval = mapCharToInteval(config, typeNode, text[0], text.length === 1);
+        let interval = mapCharToInterval(config, typeNode, text[0], text.length === 1);
 
         let finish = function () {
             writeText(config, text.slice(1), typeNode, element, callback);

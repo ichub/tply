@@ -139,6 +139,15 @@
                 }
             }
 
+            callBackProxy = proxyFunction(callBackProxy, function (element:HTMLElement, originalCallback) {
+                if (cancellation.isCancelled) {
+                    cancellation.onCancel();
+                    return;
+                }
+
+                originalCallback(element);
+            });
+
             processFn(cancellation, config, node, root, callBackProxy);
         };
     };

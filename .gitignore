@@ -3,3 +3,4 @@ css
 dist
 .idea
 .DS_Store
+src/typings

@@ -49,7 +49,8 @@ gulp.task('ts', function () {
     var tsResult = gulp.src('src/**/*.ts')
         .pipe(ts({
             declaration: true,
-            noExternalResolve: true
+            noExternalResolve: true,
+            module: "commonjs"
         }));
 
     return merge([

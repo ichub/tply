@@ -36,7 +36,10 @@
         [index: number]: T;
     }
 
-    let executeCallbackChain = function<T, U>(items:ISimpleArray<T>, processFn:(item:T, callback:() => void) => void, callback:(U) => void, defaultCallbackParam:U) {
+    let executeCallbackChain = function<T, U>(items:ISimpleArray<T>,
+                                              processFn:(item:T, callback:() => void) => void,
+                                              callback:(U) => void,
+                                              defaultCallbackParam:U) {
         let index = 0;
 
         let process = function () {
@@ -103,7 +106,11 @@
     };
 
 
-    let append = function (config:Configuration, root:HTMLElement, node:HTMLElement, desiredTag:string = null, justCopyIt:boolean = false):HTMLElement {
+    let append = function (config:Configuration,
+                           root:HTMLElement,
+                           node:HTMLElement,
+                           desiredTag:string = null,
+                           justCopyIt:boolean = false):HTMLElement {
         var clone = <HTMLElement>node.cloneNode(true);
 
         if (!justCopyIt) {
@@ -134,7 +141,10 @@
         comment: 8
     };
 
-    let processWaitNode = function (config:Configuration, node:HTMLElement, root:HTMLElement, callback:ProcessorCallback):void {
+    let processWaitNode = function (config:Configuration,
+                                    node:HTMLElement,
+                                    root:HTMLElement,
+                                    callback:ProcessorCallback):void {
         let duration = parseDuration(node.innerText);
 
         setTimeout(function () {
@@ -181,7 +191,7 @@
         return charInterval;
     };
 
-    let createCharacterElement = function(char:string): Node {
+    let createCharacterElement = function (char:string):Node {
         let charElement = document.createElement("span");
         charElement.classList.add("character");
         charElement.innerText = char;
@@ -189,7 +199,11 @@
         return charElement;
     };
 
-    let writeText = function (config:Configuration, text:string, typeNode:HTMLElement, element:HTMLElement, callback:ProcessorCallback):void {
+    let writeText = function (config:Configuration,
+                              text:string,
+                              typeNode:HTMLElement,
+                              element:HTMLElement,
+                              callback:ProcessorCallback):void {
         if (text === "") {
             callback(null);
             return;
@@ -199,7 +213,7 @@
 
         let interval = mapCharToInteval(config, typeNode, text[0], text.length === 1);
 
-        let finish = function() {
+        let finish = function () {
             writeText(config, text.slice(1), typeNode, element, callback);
             scrollDown(config);
         };
@@ -211,7 +225,11 @@
         }
     };
 
-    let processTypeNode = function (config:Configuration, node:Node, root:HTMLElement, callback:ProcessorCallback, topLevelTypeNode:HTMLElement) {
+    let processTypeNode = function (config:Configuration,
+                                    node:Node,
+                                    root:HTMLElement,
+                                    callback:ProcessorCallback,
+                                    topLevelTypeNode:HTMLElement) {
         topLevelTypeNode = topLevelTypeNode || <HTMLElement> node;
         let contents = node.childNodes;
 
@@ -239,7 +257,10 @@
         }
     };
 
-    let processDefaultNode = makeProcessor(function (config:Configuration, node:HTMLElement, root:HTMLElement, callback:ProcessorCallback):void {
+    let processDefaultNode = makeProcessor(function (config:Configuration,
+                                                     node:HTMLElement,
+                                                     root:HTMLElement,
+                                                     callback:ProcessorCallback):void {
         let noAnimateContents = node.getAttribute("data-ignore-tply") === "true";
 
         let clone = append(config, root, node, null, noAnimateContents);
@@ -274,7 +295,11 @@
         }
     };
 
-    let runAnimation = function (config:Configuration, parent:HTMLElement, nodes:NodeList, root:HTMLElement, callback:ProcessorCallback) {
+    let runAnimation = function (config:Configuration,
+                                 parent:HTMLElement,
+                                 nodes:NodeList,
+                                 root:HTMLElement,
+                                 callback:ProcessorCallback) {
         executeCallbackChain<Node, Node>(
             nodes,
             function (node:Node, callback:IVoidCallback) {

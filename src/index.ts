@@ -102,14 +102,17 @@
         };
     };
 
+
     let append = function (config:Configuration, root:HTMLElement, node:HTMLElement, desiredTag:string = null, justCopyIt:boolean = false):HTMLElement {
         var clone = <HTMLElement>node.cloneNode(true);
+
         if (!justCopyIt) {
             clone.innerHTML = "";
         }
 
-        if (typeof desiredTag !== 'undefined' && desiredTag !== null) {
+        if (desiredTag !== null) {
             var clonedInnerHtml = clone.innerHTML;
+
             clone = document.createElement(desiredTag);
             clone.innerHTML = clonedInnerHtml;
 

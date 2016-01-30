@@ -4,9 +4,7 @@ let gulp = require("gulp");
 let sass = require("gulp-sass");
 let server = require('gulp-server-livereload');
 let watch = require("gulp-watch");
-let babel = require('gulp-babel');
 let browserify = require('gulp-browserify');
-let jshint = require('gulp-jshint');
 let glob = require("multi-glob").glob;
 let path = require("path");
 let commandLineArgs = require('command-line-args');
@@ -15,6 +13,7 @@ let uglify = require('gulp-uglify');
 let cssnano = require('gulp-cssnano');
 let ts = require('gulp-typescript');
 let merge = require('merge2');
+let tslint = require("gulp-tslint");
 
 let cli = commandLineArgs([
     { name: 'production', alias: 'p', type: Boolean, defaultOption: false}
@@ -86,9 +85,11 @@ gulp.task('serve', ["watch"], () => {
 });
 
 gulp.task('lint', function () {
-    return gulp.src('./src/*.js')
-        .pipe(jshint('.jshintrc'))
-        .pipe(jshint.reporter('jshint-stylish'));
+    return gulp.src('./src/**/*.ts')
+        .pipe(tslint())
+        .pipe(tslint.report("prose", {
+            emitError: false
+        }))
 });
 
 gulp.task('default', ['serve']);

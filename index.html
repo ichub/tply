@@ -178,7 +178,7 @@
         });
     }
 
-    tply.animate(document.getElementById("template"), document.getElementById("animation"), {
+    let cancel = tply.animate(document.getElementById("template"), document.getElementById("animation"), {
         types: [
             {
                 name: "robot",
@@ -201,6 +201,10 @@
                 }
             }
         ]
+    });
+
+    cancel.registerCancellationListener(function() {
+        alert("cancelled");
     });
 </script>
 </body>

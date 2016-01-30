@@ -53,6 +53,10 @@
         process();
     };
 
+    let stripWhitespace = function (text:string):string {
+        return text.replace(/\n/, '').replace(/\s\s+/g, ' ');
+    };
+
     var makeProcessor = function (processFn:Processor):Processor {
         return function (config:Configuration,
                          node:HTMLElement,
@@ -248,9 +252,7 @@
             processNextContent();
         } else {
             if (node.nodeType === NodeType.text) {
-                let textNode = <CharacterData>node;
-
-                writeText(config, textNode.data.replace(/\n/, '').replace(/\s\s+/g, ' '), topLevelTypeNode, root, callback);
+                writeText(config, stripWhitespace((<CharacterData> node).data), topLevelTypeNode, root, callback);
             } else {
                 callback(null);
             }
@@ -262,7 +264,6 @@
                                                      root:HTMLElement,
                                                      callback:ProcessorCallback):void {
         let noAnimateContents = node.getAttribute("data-ignore-tply") === "true";
-
         let clone = append(config, root, node, null, noAnimateContents);
         clone.classList.add("fadein");
 
@@ -281,9 +282,7 @@
     let processNode = function (config:Configuration, node:Node, root:HTMLElement, callback:ProcessorCallback) {
         if (node.nodeType === NodeType.element) {
             let tag = (<HTMLElement>node).tagName.toLowerCase();
-
             let matchingProcessor = processors[tag] || processDefaultNode;
-
             matchingProcessor(config, node, root, callback);
         } else if (node.nodeType === NodeType.text) {
             root.appendChild(document.createTextNode((<CharacterData> node).data));

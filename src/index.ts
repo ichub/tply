@@ -1,6 +1,27 @@
 (function () {
-    "use strict";
     let parseDuration = require("parse-duration");
+
+    interface Configuration {
+        types?: [ {
+            name: string,
+            properties?: any,
+            styleClasses?: string,
+            style?: string
+        }],
+        processing?: [ {
+            tag: string,
+            pre: (element:HTMLElement) => void,
+            post: (element:HTMLElement) => void
+        }]
+    }
+
+    interface ProcessorCallback {
+        (element:HTMLElement): void;
+    }
+
+    interface Processor {
+        (config:Configuration, node:HTMLElement, root:HTMLElement, callback:ProcessorCallback): void
+    }
 
     var makeProcessor = function (processFn) {
         return function (config, node, root, callback) {

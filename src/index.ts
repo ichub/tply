@@ -130,10 +130,10 @@
                         }
 
                         if (typeof proc.post === "function") {
-                            callBackProxy = function (element:HTMLElement) {
+                            callBackProxy = makeProxy(callBackProxy, function (element:HTMLElement, originalCallback) {
                                 proc.post(element);
-                                callback(element);
-                            };
+                                originalCallback(element);
+                            });
                         }
                     }
                 }

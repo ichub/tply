@@ -88,7 +88,7 @@ gulp.task('serve', ["watch"], () => {
 });
 
 gulp.task('lint', function () {
-    return gulp.src('./src/**/*.ts')
+    return gulp.src('./src/*.ts')
         .pipe(tslint())
         .pipe(tslint.report("prose", {
             emitError: false

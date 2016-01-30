@@ -1,6 +1,16 @@
 (function () {
     let parseDuration = require("parse-duration");
 
+    enum NodeType {
+        Element = 1,
+        Attribute = 2,
+        Text = 3,
+        Comment = 8
+    }
+
+    /**
+     * Type of object used to configure the behavior of tply for a given animation.
+     */
     interface IConfiguration {
         types?: [{
             name: string,
@@ -15,10 +25,23 @@
         }]
     }
 
+    /**
+     * When a processor finishes processing its given element and that element's children,
+     * it yields control back to its parent by calling this function. The `element` parameter
+     * is a reference to the element which the processor inserted into the DOM.
+     */
     interface IProcessorCallback {
         (element:HTMLElement | void): void;
     }
 
+    /**
+     * Processors are in charge of animating a given element or node. They should respond to
+     * cancellation requests (most of the time this works by default, since it is injected
+     * into the processor using the {@link makeProcessor} function). They should yield control
+     * back to the caller once animation is completed using the `callback` function. There is a
+     * `...params:any[]` parameter because some processors may be recursive, and pass extra
+     * parameters to themselves on subsequent runs.
+     */
     interface IProcessor {
         (cancellation:Cancellation,
          config:IConfiguration,
@@ -32,11 +55,22 @@
         ():void;
     }
 
+    /**
+     * This is necessary because the {@link NodeList} object prototype et. al. are severely
+     * crippled versions of JavaScript arrays, and don't support simple things like `forEach`,
+     * `map`, `filter`, etc. If we just want to be able to get the length of these shady types,
+     * and index on them, this interface provides a generic way of doing that.
+     */
     interface ISimpleArray<T> {
         length: number;
         [index: number]: T;
     }
 
+    /**
+     * This class is in charge of keeping track of the cancellation state of a given
+     * animation. Since some animations can be super long, there may arise a need to cancel
+     * one at some time or another.
+     */
     class Cancellation {
         private _isCancelled:boolean = false;
         private cancellationListeners:Array<() => void> = [];
@@ -60,6 +94,19 @@
         }
     }
 
+    /**
+     * Since the DOM is a tree, and to process a node we need to process its children too. Since
+     * processing each node could take an arbitrary amount of time (ie. it is asynchronous,
+     * we need to be able to chain together the processing of nodes. This method processes each
+     * element in a given array with a given function, handing off execution to process the next
+     * element after the completion of processing of the previous one. At the end, after the final
+     * element is processed, this function calls the `callback` method with the `defaultCallbackParam`
+     * as the value.
+     * @param items - An array-like object of items to process.
+     * @param processFn - A function that processes an item, and calls a callback after finishing.
+     * @param callback - Function to call after all elements have been processed.
+     * @param defaultCallbackParam - The default value to pass the `callback` function.
+     */
     let executeCallbackChain = function<T, U>(items:ISimpleArray<T>,
                                               processFn:(item:T, callback:() => void) => void,
                                               callback:(U) => void,
@@ -81,6 +128,16 @@
         return text.replace(/\n/, '').replace(/\s\s+/g, ' ');
     };
 
+    /**
+     * Wraps a given function in another one, which is responsible for calling
+     * the original one if the original one needs to be executed.
+     * @param original - A function to wrap.
+     * @param wrapper - Function that should be called in place of the original one,
+     * has the same parameters as the original one, with an additional parameter at the
+     * end, which is the original function. Do with the original function as you wish -
+     * call or don't - up to you.
+     * @returns - Function with the same signature as the original one.
+     */
     let makeProxy = function (original:Function, wrapper:Function) {
         return function () {
             let argsArray = Array.prototype.slice.call(arguments);
@@ -90,12 +147,18 @@
         }
     };
 
+    /**
+     * Wraps a processor that does animation with some extra logic which enables us to
+     * pre- and post- process elements, style them, and give them extra attributes defined
+     * by the configuration. Additionally, stops the animation if it is cancelled.
+     * @param processFn
+     */
     var makeProcessor = function (processFn:IProcessor):IProcessor {
         return function (cancellation:Cancellation,
                          config:IConfiguration,
                          node:HTMLElement,
                          root:HTMLElement,
-                         callback:IProcessorCallback) {
+                         callback:IProcessorCallback):void {
             var callBackProxy = callback;
 
             for (let i = 0; i < node.attributes.length; i++) {
@@ -142,6 +205,8 @@
             callBackProxy = makeProxy(callBackProxy, function (element:HTMLElement, originalCallback) {
                 if (cancellation.isCancelled) {
                     cancellation.onCancel();
+                    // not calling the `originalCallback` effectively
+                    // stops the animation - this is deliberate.
                     return;
                 }
 
@@ -153,6 +218,15 @@
     };
 
 
+    /**
+     * Appends a clone of an HTML Element to another one, conditionally removing
+     * all of its children.
+     * @param config - Configuration for options.
+     * @param root - The element to which the clone will be appended.
+     * @param node - The element to clone and append.
+     * @param desiredTag - The desired tag that the clone should be (ie. 'div', 'a', 'span', etc.)
+     * @param justCopyIt - If true, copy the children too, if false do not copy the children.
+     */
     let append = function (config:IConfiguration,
                            root:HTMLElement,
                            node:HTMLElement,
@@ -179,13 +253,6 @@
 
         root.appendChild(clone);
         return clone;
-    };
-
-    const NodeType = {
-        element: 1,
-        attribute: 2,
-        text: 3,
-        comment: 8
     };
 
     let processWaitNode = function (cancellation:Cancellation,
@@ -299,7 +366,7 @@
                 null
             );
         } else {
-            if (node.nodeType === NodeType.text) {
+            if (node.nodeType === NodeType.Text) {
                 writeText(
                     cancellation,
                     config,
@@ -339,11 +406,11 @@
                                 node:Node,
                                 root:HTMLElement,
                                 callback:IProcessorCallback) {
-        if (node.nodeType === NodeType.element) {
+        if (node.nodeType === NodeType.Element) {
             let tag = (<HTMLElement>node).tagName.toLowerCase();
             let matchingProcessor = processors[tag] || processDefaultNode;
             matchingProcessor(cancellation, config, node, root, callback);
-        } else if (node.nodeType === NodeType.text) {
+        } else if (node.nodeType === NodeType.Text) {
             root.appendChild(document.createTextNode((<CharacterData> node).data));
             scrollDown(config);
             callback(null);

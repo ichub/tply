@@ -27,6 +27,19 @@
          ...params:any[]): void
     }
 
+    let executeCallbackChain = function<T>(items:T[], processFn:(item:T, callback:() => void) => void, callback:() => void) {
+        let index = 0;
+
+        let process = function () {
+            if (index < items.length) {
+                processFn(items[index], process);
+                index++;
+            } else {
+                callback();
+            }
+        }
+    };
+
     var makeProcessor = function (processFn:Processor):Processor {
         return function (config:Configuration,
                          node:HTMLElement,

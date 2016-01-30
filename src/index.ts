@@ -235,9 +235,10 @@
                                     callback:ProcessorCallback,
                                     topLevelTypeNode:HTMLElement) {
         topLevelTypeNode = topLevelTypeNode || <HTMLElement> node;
-        let appendedRoot = append(config, root, <HTMLElement> node);
 
         if (node.childNodes.length >= 1) {
+            let appendedRoot = append(config, root, <HTMLElement> node);
+
             executeCallbackChain<Node, Node>(
                 node.childNodes,
                 function (node:Node, callback:IVoidCallback) {

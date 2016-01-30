@@ -1,4 +1,4 @@
-(function() {
+(function () {
     let parseDuration = require("parse-duration");
 
     interface Configuration {
@@ -10,21 +10,28 @@
         }],
         processing?: [{
             tag: string,
-            pre: (element: HTMLElement) => void,
-            post: (element: HTMLElement) => void
+            pre: (element:HTMLElement) => void,
+            post: (element:HTMLElement) => void
         }]
     }
 
     interface ProcessorCallback {
-        (element: HTMLElement | void): void;
+        (element:HTMLElement | void): void;
     }
 
     interface Processor {
-        (config: Configuration, node: HTMLElement | Node, root: HTMLElement, callback: ProcessorCallback, ...params: any[]): void
+        (config:Configuration,
+         node:HTMLElement | Node,
+         root:HTMLElement,
+         callback:ProcessorCallback,
+         ...params:any[]): void
     }
 
-    var makeProcessor = function(processFn: Processor): Processor {
-        return function(config: Configuration, node: HTMLElement, root: HTMLElement, callback: ProcessorCallback) {
+    var makeProcessor = function (processFn:Processor):Processor {
+        return function (config:Configuration,
+                         node:HTMLElement,
+                         root:HTMLElement,
+                         callback:ProcessorCallback) {
             var callBackProxy = callback;
 
             for (let i = 0; i < node.attributes.length; i++) {
@@ -59,7 +66,7 @@
                         }
 
                         if (typeof proc.post === "function") {
-                            callBackProxy = function(element: HTMLElement) {
+                            callBackProxy = function (element:HTMLElement) {
                                 proc.post(element);
                                 callback(element);
                             };
@@ -72,7 +79,7 @@
         };
     };
 
-    let append = function(config: Configuration, root: HTMLElement, node: HTMLElement, desiredTag: string = null, justCopyIt: boolean = false): HTMLElement {
+    let append = function (config:Configuration, root:HTMLElement, node:HTMLElement, desiredTag:string = null, justCopyIt:boolean = false):HTMLElement {
         var clone = <HTMLElement>node.cloneNode(true);
         if (!justCopyIt) {
             clone.innerHTML = "";
@@ -101,20 +108,20 @@
         comment: 8
     };
 
-    let processWaitNode = function(config: Configuration, node: HTMLElement, root: HTMLElement, callback: ProcessorCallback): void {
+    let processWaitNode = function (config:Configuration, node:HTMLElement, root:HTMLElement, callback:ProcessorCallback):void {
         let duration = parseDuration(node.innerText);
 
-        setTimeout(function() {
+        setTimeout(function () {
             callback(null);
         }, duration);
     };
 
-    let scrollDown = function(config: Configuration): void {
+    let scrollDown = function (config:Configuration):void {
         return;
         window.scroll(0, document.documentElement.offsetHeight);
     };
 
-    let mapCharToInteval = function(config: Configuration, node: HTMLElement, char: string, isEnd: boolean): number {
+    let mapCharToInteval = function (config:Configuration, node:HTMLElement, char:string, isEnd:boolean):number {
         let defaultCharInterval = "50ms";
         let defaultPeriodInterval = "500ms";
         let defaultCommaInterval = "300ms";
@@ -148,7 +155,7 @@
         return charInterval;
     };
 
-    let writeText = function(config: Configuration, text: string, typeNode: HTMLElement, element: HTMLElement, callback: ProcessorCallback): void {
+    let writeText = function (config:Configuration, text:string, typeNode:HTMLElement, element:HTMLElement, callback:ProcessorCallback):void {
         if (text === "") {
             if (typeof callback === "undefined") {
                 return;
@@ -170,14 +177,14 @@
             writeText(config, text.slice(1), typeNode, element, callback);
             scrollDown(config);
         } else {
-            setTimeout(function() {
+            setTimeout(function () {
                 writeText(config, text.slice(1), typeNode, element, callback);
                 scrollDown();
             }, interval);
         }
     };
 
-    let processTypeNode = function(config: Configuration, node: Node, root: HTMLElement, callback: ProcessorCallback, topLevelTypeNode: HTMLElement) {
+    let processTypeNode = function (config:Configuration, node:Node, root:HTMLElement, callback:ProcessorCallback, topLevelTypeNode:HTMLElement) {
         topLevelTypeNode = topLevelTypeNode || node;
         let contents = node.childNodes;
 
@@ -185,7 +192,7 @@
             var index = 0;
             let appendedRoot = append(config, root, <HTMLElement>node);
 
-            let processNextContent = function() {
+            let processNextContent = function () {
                 if (index < contents.length) {
                     processTypeNode(config, contents[index++], appendedRoot, processNextContent, topLevelTypeNode);
                 } else {
@@ -205,7 +212,7 @@
         }
     };
 
-    let processDefaultNode = makeProcessor(function(config: Configuration, node: HTMLElement, root: HTMLElement, callback: ProcessorCallback): void {
+    let processDefaultNode = makeProcessor(function (config:Configuration, node:HTMLElement, root:HTMLElement, callback:ProcessorCallback):void {
         var clone;
 
         if (node.getAttribute("data-ignore-tply") === "true") {
@@ -224,7 +231,7 @@
         "wait": makeProcessor(processWaitNode)
     };
 
-    let processNode = function(config: Configuration, node: Node, root: HTMLElement, callback: ProcessorCallback) {
+    let processNode = function (config:Configuration, node:Node, root:HTMLElement, callback:ProcessorCallback) {
         if (node.nodeType === NodeType.element) {
             let element = <HTMLElement>node;
             let tag = element.tagName.toLowerCase();
@@ -247,7 +254,7 @@
         }
     };
 
-    let runAnimation = function(config: Configuration, parent: HTMLElement, nodes: NodeList, root: HTMLElement, callback: ProcessorCallback = (e) => {
+    let runAnimation = function (config:Configuration, parent:HTMLElement, nodes:NodeList, root:HTMLElement, callback:ProcessorCallback = (e) => {
     }) {
         if (nodes.length === 0) {
             callback(parent);
@@ -256,7 +263,7 @@
 
         var index = 0;
 
-        let animateRemainingNodes = function() {
+        let animateRemainingNodes = function () {
             index++;
 
             if (index < nodes.length) {
@@ -272,12 +279,12 @@
 
     interface Window {
         tply: {
-            animate(from: HTMLElement, to: HTMLElement, conf: Configuration, callback: ProcessorCallback)
+            animate(from:HTMLElement, to:HTMLElement, conf:Configuration, callback:ProcessorCallback)
         }
     }
     window.tply = window.tply || {
-        animate: function(from, to, conf, callback) {
-            runAnimation(conf || {}, from, from.childNodes, to, callback);
-        }
-    };
+            animate: function (from, to, conf, callback) {
+                runAnimation(conf || {}, from, from.childNodes, to, callback);
+            }
+        };
 })();

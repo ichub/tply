@@ -45,7 +45,7 @@ gulp.task('sass', () => {
         .pipe(gulp.dest('./css'));
 });
 
-gulp.task('ts', ['format'], function () {
+gulp.task('ts', function () {
     var tsResult = gulp.src('src/**/*.ts')
         .pipe(ts({
             declaration: true,

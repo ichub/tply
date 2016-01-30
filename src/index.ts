@@ -1,7 +1,7 @@
 (function () {
     let parseDuration = require("parse-duration");
 
-    interface Configuration {
+    interface IConfiguration {
         types?: [{
             name: string,
             properties?: any,
@@ -15,15 +15,15 @@
         }]
     }
 
-    interface ProcessorCallback {
+    interface IProcessorCallback {
         (element:HTMLElement | void): void;
     }
 
-    interface Processor {
-        (config:Configuration,
+    interface IProcessor {
+        (config:IConfiguration,
          node:HTMLElement | Node,
          root:HTMLElement,
-         callback:ProcessorCallback,
+         callback:IProcessorCallback,
          ...params:any[]): void
     }
 
@@ -57,11 +57,11 @@
         return text.replace(/\n/, '').replace(/\s\s+/g, ' ');
     };
 
-    var makeProcessor = function (processFn:Processor):Processor {
-        return function (config:Configuration,
+    var makeProcessor = function (processFn:IProcessor):IProcessor {
+        return function (config:IConfiguration,
                          node:HTMLElement,
                          root:HTMLElement,
-                         callback:ProcessorCallback) {
+                         callback:IProcessorCallback) {
             var callBackProxy = callback;
 
             for (let i = 0; i < node.attributes.length; i++) {
@@ -110,7 +110,7 @@
     };
 
 
-    let append = function (config:Configuration,
+    let append = function (config:IConfiguration,
                            root:HTMLElement,
                            node:HTMLElement,
                            desiredTag:string = null,
@@ -145,10 +145,10 @@
         comment: 8
     };
 
-    let processWaitNode = function (config:Configuration,
+    let processWaitNode = function (config:IConfiguration,
                                     node:HTMLElement,
                                     root:HTMLElement,
-                                    callback:ProcessorCallback):void {
+                                    callback:IProcessorCallback):void {
         let duration = parseDuration(node.innerText);
 
         setTimeout(function () {
@@ -156,12 +156,12 @@
         }, duration);
     };
 
-    let scrollDown = function (config:Configuration):void {
+    let scrollDown = function (config:IConfiguration):void {
         return;
         window.scroll(0, document.documentElement.offsetHeight);
     };
 
-    let mapCharToInterval = function (config:Configuration, node:HTMLElement, char:string, isEnd:boolean):number {
+    let mapCharToInterval = function (config:IConfiguration, node:HTMLElement, char:string, isEnd:boolean):number {
         let defaultCharInterval = "50ms";
         let defaultPeriodInterval = "500ms";
         let defaultCommaInterval = "300ms";
@@ -203,11 +203,11 @@
         return charElement;
     };
 
-    let writeText = function (config:Configuration,
+    let writeText = function (config:IConfiguration,
                               text:string,
                               typeNode:HTMLElement,
                               element:HTMLElement,
-                              callback:ProcessorCallback):void {
+                              callback:IProcessorCallback):void {
         if (text === "") {
             callback(null);
             return;
@@ -229,10 +229,10 @@
         }
     };
 
-    let processTypeNode = function (config:Configuration,
+    let processTypeNode = function (config:IConfiguration,
                                     node:Node,
                                     root:HTMLElement,
-                                    callback:ProcessorCallback,
+                                    callback:IProcessorCallback,
                                     topLevelTypeNode:HTMLElement) {
         topLevelTypeNode = topLevelTypeNode || <HTMLElement> node;
 
@@ -256,10 +256,10 @@
         }
     };
 
-    let processDefaultNode = makeProcessor(function (config:Configuration,
+    let processDefaultNode = makeProcessor(function (config:IConfiguration,
                                                      node:HTMLElement,
                                                      root:HTMLElement,
-                                                     callback:ProcessorCallback):void {
+                                                     callback:IProcessorCallback):void {
         let noAnimateContents = node.getAttribute("data-ignore-tply") === "true";
         let clone = append(config, root, node, null, noAnimateContents);
         clone.classList.add("fadein");
@@ -276,7 +276,7 @@
         "wait": makeProcessor(processWaitNode)
     };
 
-    let processNode = function (config:Configuration, node:Node, root:HTMLElement, callback:ProcessorCallback) {
+    let processNode = function (config:IConfiguration, node:Node, root:HTMLElement, callback:IProcessorCallback) {
         if (node.nodeType === NodeType.element) {
             let tag = (<HTMLElement>node).tagName.toLowerCase();
             let matchingProcessor = processors[tag] || processDefaultNode;
@@ -291,11 +291,11 @@
         }
     };
 
-    let runAnimation = function (config:Configuration,
+    let runAnimation = function (config:IConfiguration,
                                  parent:HTMLElement,
                                  nodes:NodeList,
                                  root:HTMLElement,
-                                 callback:ProcessorCallback) {
+                                 callback:IProcessorCallback) {
         executeCallbackChain<Node, Node>(
             nodes,
             function (node:Node, callback:IVoidCallback) {

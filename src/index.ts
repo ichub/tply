@@ -36,6 +36,29 @@
         [index: number]: T;
     }
 
+    class Cancellation {
+        private _isCancelled:boolean = false;
+        private cancellationListeners: Array<() => void> = [];
+
+        public cancel():void {
+            this._isCancelled = true;
+        }
+
+        public registerCancellationListener(listener:() => void):void {
+            this.cancellationListeners.push(listener);
+        }
+
+        public onCancel():void {
+            this.cancellationListeners.forEach((listener) => {
+                listener();
+            })
+        }
+
+        public get isCancelled():boolean {
+            return this._isCancelled;
+        }
+    }
+
     let executeCallbackChain = function<T, U>(items:ISimpleArray<T>,
                                               processFn:(item:T, callback:() => void) => void,
                                               callback:(U) => void,

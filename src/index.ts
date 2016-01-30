@@ -36,14 +36,14 @@
         [index: number]: T;
     }
 
-    let executeCallbackChain = function<T>(items:ISimpleArray<T>, processFn:(item:T, callback:() => void) => void, callback:() => void) {
+    let executeCallbackChain = function<T, U>(items:ISimpleArray<T>, processFn:(item:T, callback:() => void) => void, callback:(U) => void, defaultCallbackParam:U) {
         let index = 0;
 
         let process = function () {
             if (index < items.length) {
                 processFn(items[index++], process);
             } else {
-                callback();
+                callback(defaultCallbackParam);
             }
         };
 
@@ -277,26 +277,19 @@
         }
     };
 
-    let runAnimation = function (config:Configuration, parent:HTMLElement, nodes:NodeList, root:HTMLElement, callback:ProcessorCallback = (e) => {
-    }) {
-        if (nodes.length === 0) {
-            callback(parent);
-            return;
-        }
-
-        executeCallbackChain(
+    let runAnimation = function (config:Configuration, parent:HTMLElement, nodes:NodeList, root:HTMLElement, callback:ProcessorCallback) {
+        executeCallbackChain<Node, Node>(
             nodes,
-            function(node:Node, callback:IVoidCallback) {
+            function (node:Node, callback:IVoidCallback) {
                 processNode(config, node.cloneNode(true), root, callback);
             },
-            function() {
-                callback(root)
-            }
+            callback,
+            root
         );
     };
 
     (<any> window).tply = (<any> window).tply || {
-            animate: function (from, to, conf, callback) {
+            animate: function (from, to, conf, callback = () => null) {
                 runAnimation(conf || {}, from, from.childNodes, to, callback);
             }
         };

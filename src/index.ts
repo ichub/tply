@@ -314,6 +314,9 @@
         return charElement;
     };
 
+    /**
+     * This is where the magic happens - here we type out text into an HTML Element.
+     */
     let writeText = function (cancellation:Cancellation,
                               config:IConfiguration,
                               text:string,
@@ -327,6 +330,8 @@
 
         if (cancellation.isCancelled) {
             cancellation.onCancel();
+            // again, not calling the callback effectively stops
+            // the animation.
             return;
         }
 

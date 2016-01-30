@@ -81,6 +81,15 @@
         return text.replace(/\n/, '').replace(/\s\s+/g, ' ');
     };
 
+    let proxyFunction = function (original:Function, wrapper:Function) {
+        return function () {
+            let argsArray = Array.prototype.slice.call(arguments);
+            argsArray.push(original);
+
+            wrapper.apply(this, argsArray);
+        }
+    };
+
     var makeProcessor = function (processFn:IProcessor):IProcessor {
         return function (cancellation:Cancellation,
                          config:IConfiguration,
@@ -319,7 +328,7 @@
         if (node.nodeType === NodeType.element) {
             let tag = (<HTMLElement>node).tagName.toLowerCase();
             let matchingProcessor = processors[tag] || processDefaultNode;
-            matchingProcessor(config, node, root, callback);
+            matchingProcessor(cancellation, config, node, root, callback);
         } else if (node.nodeType === NodeType.text) {
             root.appendChild(document.createTextNode((<CharacterData> node).data));
             scrollDown(config);

@@ -162,7 +162,7 @@
             var callBackProxy = callback;
 
             for (let i = 0; i < node.attributes.length; i++) {
-                if (typeof !Array.isArray(config.types)) {
+                if (!Array.isArray(config.types)) {
                     break;
                 }
 

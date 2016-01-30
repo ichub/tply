@@ -69,9 +69,14 @@
                         </type>
                         <wait>500ms</wait>
                         <br>
-                        <type>or i can type super</type>
-                        <type data-char-interval="500ms"> duper</type>
-                        <type data-char-interval="750ms"> slow.</type>
+                        <type data-type="robot">Or I can even type like a spooky robot</type>
+                        <wait>500ms</wait>
+                        <br>
+                        <span style="font-size: 0.8em;">
+                            <type>or I can type super</type>
+                            <type data-char-interval="500ms"> duper</type>
+                            <type data-char-interval="750ms"> slow.</type>
+                        </span>
                     </div>
                     <div class="tply-animation"></div>
                 </div>
@@ -111,11 +116,35 @@
 <script>
     "use strict";
 
+    let tplyConfiguration = {
+        types: [
+            {
+                name: "robot",
+                properties: {
+                    "data-char-interval": "0ms",
+                    "data-period-interval": "0ms",
+                    "data-comma-interval": "0ms",
+                    "data-end-interval": "0ms",
+                    "data-word-interval": "200ms"
+                },
+                styleClasses: "robot"
+            }
+        ],
+        processing: [
+            {
+                tag: "code",
+                post: function (element) {
+                    hljs.highlightBlock(element);
+                }
+            }
+        ]
+    };
+
     let covers = document.querySelectorAll(".cover");
     let transitionInDuration = 200;
     let transitionOutDuration = 500;
 
-    let isDone = Array.apply(null, new Array(covers.length)).map(function() {
+    let isDone = Array.apply(null, new Array(covers.length)).map(function () {
         return true;
     });
 
@@ -145,7 +174,7 @@
             cover.classList.add("hidden");
 
             setTimeout(function () {
-                tply.animate(template, animation, {}, function () {
+                tply.animate(template, animation, tplyConfiguration, function () {
                     isDone[i] = true;
 
                     if (!mouseIn[i]) {
@@ -178,32 +207,9 @@
         });
     }
 
-    let cancel = tply.animate(document.getElementById("template"), document.getElementById("animation"), {
-        types: [
-            {
-                name: "robot",
-                properties: {
-                    "data-char-interval": "0ms",
-                    "data-period-interval": "0ms",
-                    "data-comma-interval": "0ms",
-                    "data-end-interval": "0ms",
-                    "data-word-interval": "200ms"
-                },
-                styleClasses: "robot",
-                style: "color: red;"
-            }
-        ],
-        processing: [
-            {
-                tag: "code",
-                post: function (element) {
-                    hljs.highlightBlock(element);
-                }
-            }
-        ]
-    });
+    let cancel = tply.animate(document.getElementById("template"), document.getElementById("animation"), tplyConfiguration);
 
-    cancel.registerCancellationListener(function() {
+    cancel.registerCancellationListener(function () {
         alert("cancelled");
     });
 </script>

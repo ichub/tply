@@ -13,6 +13,8 @@ let commandLineArgs = require('command-line-args');
 let gulpif = require('gulp-if');
 let uglify = require('gulp-uglify');
 let cssnano = require('gulp-cssnano');
+let ts = require('gulp-typescript');
+let merge = require('merge2');
 
 let cli = commandLineArgs([
     { name: 'production', alias: 'p', type: Boolean, defaultOption: false}
@@ -21,10 +23,10 @@ let cli = commandLineArgs([
 let options = cli.parse();
 
 let sassGlob = './sass/**/*.scss';
-let jsGlob = "./src/**/*.js";
+let tsGlob = "./src/**/*.ts";
 
 let sassOutputGlob = './css/**/*.css';
-let jsOutputGlob = './dist/**/*.js';
+let tsOutputGlob = './dist/**/*.ts';
 let htmlGlob = './index.html';
 
 function swallowError(error) {
@@ -42,23 +44,28 @@ gulp.task('sass', () => {
         .pipe(gulp.dest('./css'));
 });
 
-gulp.task('js', () => {
-    return gulp.src(jsGlob)
-        .pipe(babel({
-            presets: ['es2015'],
-            highlightCode: false
-        }))
-        .on('error', swallowError)
-        .pipe(browserify({
-            insertGlobals: false
-        }))
-        .pipe(gulpif(options.production, uglify()))
-        .pipe(gulp.dest('dist'));
+gulp.task('ts', function() {
+    var tsResult = gulp.src('src/**/*.ts')
+        .pipe(ts({
+            declaration: true,
+            noExternalResolve: true
+        }));
+
+    return merge([
+        tsResult.dts.pipe(gulp.dest('dist')),
+        tsResult.js
+            .pipe(browserify({
+                insertGlobals: false
+            }))
+            .pipe(gulpif(options.production, uglify()))
+            .pipe(gulp.dest('dist'))
+    ]);
 });
 
-gulp.task("watch", ['sass', 'js'], () => {
+
+gulp.task("watch", ['sass', 'ts'], () => {
     gulp.watch(sassGlob, ['sass']);
-    gulp.watch(jsGlob, ['js']);
+    gulp.watch(tsGlob, ['ts']);
 });
 
 gulp.task('serve', ["watch"], () => {
@@ -67,7 +74,7 @@ gulp.task('serve', ["watch"], () => {
             livereload: {
                 enable: true,
                 filter: function (filePath, cb) {
-                    glob([jsOutputGlob, sassOutputGlob, htmlGlob], function (err, files) {
+                    glob([tsOutputGlob, sassOutputGlob, htmlGlob], function (err, files) {
                         cb(files.map(function (file) {
                                 return path.resolve(file);
                             }).indexOf(filePath) > -1);

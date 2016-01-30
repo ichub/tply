@@ -159,6 +159,13 @@
                          node:HTMLElement,
                          root:HTMLElement,
                          callback:IProcessorCallback):void {
+            if (cancellation.isCancelled) {
+                cancellation.onCancel();
+                // not calling the callback effectively
+                // stops the animation - this is deliberate.
+                return;
+            }
+
             var callBackProxy = callback;
 
             for (let i = 0; i < node.attributes.length; i++) {
@@ -201,17 +208,6 @@
                     }
                 }
             }
-
-            callBackProxy = makeProxy(callBackProxy, function (element:HTMLElement, originalCallback) {
-                if (cancellation.isCancelled) {
-                    cancellation.onCancel();
-                    // not calling the `originalCallback` effectively
-                    // stops the animation - this is deliberate.
-                    return;
-                }
-
-                originalCallback(element);
-            });
 
             processFn(cancellation, config, node, root, callBackProxy);
         };

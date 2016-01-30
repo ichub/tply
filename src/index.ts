@@ -256,19 +256,13 @@
 
     let processNode = function (config:Configuration, node:Node, root:HTMLElement, callback:ProcessorCallback) {
         if (node.nodeType === NodeType.element) {
-            let element = <HTMLElement>node;
-            let tag = element.tagName.toLowerCase();
+            let tag = (<HTMLElement>node).tagName.toLowerCase();
 
-            let matchingProcessor = processors[tag];
+            let matchingProcessor = processors[tag] || processDefaultNode;
 
-            if (typeof matchingProcessor !== "undefined") {
-                matchingProcessor(config, node, root, callback);
-            } else {
-                processDefaultNode(config, node, root, callback);
-            }
+            matchingProcessor(config, node, root, callback);
         } else if (node.nodeType === NodeType.text) {
-            let textNode = <CharacterData>node;
-            root.appendChild(document.createTextNode(textNode.data));
+            root.appendChild(document.createTextNode((<CharacterData> node).data));
             scrollDown(config);
             callback(null);
         } else {

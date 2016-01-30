@@ -235,21 +235,17 @@
                                     callback:ProcessorCallback,
                                     topLevelTypeNode:HTMLElement) {
         topLevelTypeNode = topLevelTypeNode || <HTMLElement> node;
-        let contents = node.childNodes;
+        let appendedRoot = append(config, root, <HTMLElement> node);
 
-        if (contents.length >= 1) {
-            var index = 0;
-            let appendedRoot = append(config, root, <HTMLElement>node);
-
-            let processNextContent = function () {
-                if (index < contents.length) {
-                    processTypeNode(config, contents[index++], appendedRoot, processNextContent, topLevelTypeNode);
-                } else {
-                    callback(null);
-                }
-            };
-
-            processNextContent();
+        if (node.childNodes.length >= 1) {
+            executeCallbackChain<Node, Node>(
+                node.childNodes,
+                function (node:Node, callback:IVoidCallback) {
+                    processTypeNode(config, node, appendedRoot, callback, topLevelTypeNode);
+                },
+                callback,
+                null
+            );
         } else {
             if (node.nodeType === NodeType.text) {
                 writeText(config, stripWhitespace((<CharacterData> node).data), topLevelTypeNode, root, callback);

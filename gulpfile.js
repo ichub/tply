@@ -18,7 +18,7 @@ let tsfmt = require("gulp-tsfmt");
 let changedInPlace = require("gulp-changed-in-place");
 
 let cli = commandLineArgs([
-    { name: 'production', alias: 'p', type: Boolean, defaultOption: false}
+    {name: 'production', alias: 'p', type: Boolean, defaultOption: false}
 ]);
 
 let options = cli.parse();
@@ -45,7 +45,7 @@ gulp.task('sass', () => {
         .pipe(gulp.dest('./css'));
 });
 
-gulp.task('ts', function() {
+gulp.task('ts', function () {
     var tsResult = gulp.src('src/**/*.ts')
         .pipe(ts({
             declaration: true,
@@ -96,10 +96,8 @@ gulp.task('lint', function () {
 
 gulp.task('format', () => {
     gulp.src('src/**/*.ts')
-        .pipe(changedInPlace())
-        .pipe(tsfmt({ options: {
-            
-        }))
+        .pipe(tsfmt({
+            options: {}}))
         .pipe(gulp.dest(file => path.dirname(file.path)));
 });
 

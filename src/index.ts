@@ -16,18 +16,18 @@
     }
 
     interface ProcessorCallback {
-        (element:HTMLElement): void;
+        (element:HTMLElement|void): void;
     }
 
     interface Processor {
-        (config:Configuration, node:HTMLElement, root:HTMLElement, callback:ProcessorCallback): void
+        (config:Configuration, node:HTMLElement | Node, root:HTMLElement, callback:ProcessorCallback, ...params:any[]): void
     }
 
-    var makeProcessor = function (processFn) {
-        return function (config, node, root, callback) {
+    var makeProcessor = function (processFn:Processor):Processor {
+        return function (config:Configuration, node:HTMLElement, root:HTMLElement, callback:ProcessorCallback) {
             var callBackProxy = callback;
 
-            for (var i = 0; i < node.attributes.length; i++) {
+            for (let i = 0; i < node.attributes.length; i++) {
                 if (typeof !Array.isArray(config.types)) {
                     break;
                 }
@@ -59,7 +59,7 @@
                         }
 
                         if (typeof proc.post === "function") {
-                            callBackProxy = function (element) {
+                            callBackProxy = function (element:HTMLElement) {
                                 proc.post(element);
                                 callback(element);
                             };
@@ -72,10 +72,8 @@
         };
     };
 
-    let append = function (config, root, node, desiredTag, justCopyIt) {
-        justCopyIt = justCopyIt || false;
-
-        var clone = node.cloneNode(true);
+    let append = function (config:Configuration, root:HTMLElement, node:HTMLElement, desiredTag:string = null, justCopyIt:boolean = false):HTMLElement {
+        var clone = <HTMLElement> node.cloneNode(true);
         if (!justCopyIt) {
             clone.innerHTML = "";
         }
@@ -85,10 +83,9 @@
             clone = document.createElement(desiredTag);
             clone.innerHTML = clonedInnerHtml;
 
-
-            node.attributes.forEach(function (attr) {
-                clone.setAttribute(attr.name, attr.value);
-            });
+            for (let i = 0; i < node.attributes.length; i++) {
+                clone.setAttribute(node.attributes[i].name, node.attributes[i].value);
+            }
 
             clone.className = node.className;
         }
@@ -97,14 +94,14 @@
         return clone;
     };
 
-    let NodeType = {
+    const NodeType = {
         element: 1,
         attribute: 2,
         text: 3,
         comment: 8
     };
 
-    let processWaitNode = function (config, node, root, callback) {
+    let processWaitNode = function (config:Configuration, node:HTMLElement, root:HTMLElement, callback:ProcessorCallback):void {
         let duration = parseDuration(node.innerText);
 
         setTimeout(function () {
@@ -112,12 +109,12 @@
         }, duration);
     };
 
-    let scrollDown = function (config) {
+    let scrollDown = function (config:Configuration):void {
         return;
         window.scroll(0, document.documentElement.offsetHeight);
     };
 
-    let mapCharToInteval = function (config, node, char, isEnd) {
+    let mapCharToInteval = function (config:Configuration, node:HTMLElement, char:string, isEnd:boolean):number {
         let defaultCharInterval = "50ms";
         let defaultPeriodInterval = "500ms";
         let defaultCommaInterval = "300ms";
@@ -151,7 +148,7 @@
         return charInterval;
     };
 
-    let writeText = function (config, text, typeNode, element, callback) {
+    let writeText = function (config:Configuration, text:string, typeNode:HTMLElement, element:HTMLElement, callback:ProcessorCallback):void {
         if (text === "") {
             if (typeof callback === "undefined") {
                 return;
@@ -180,13 +177,13 @@
         }
     };
 
-    let processTypeNode = function (config, node, root, callback, topLevelTypeNode) {
+    let processTypeNode = function (config:Configuration, node:Node, root:HTMLElement, callback:ProcessorCallback, topLevelTypeNode:HTMLElement) {
         topLevelTypeNode = topLevelTypeNode || node;
         let contents = node.childNodes;
 
         if (contents.length >= 1) {
             var index = 0;
-            let appendedRoot = append(config, root, node);
+            let appendedRoot = append(config, root, <HTMLElement> node);
 
             let processNextContent = function () {
                 if (index < contents.length) {
@@ -199,14 +196,16 @@
             processNextContent();
         } else {
             if (node.nodeType === NodeType.text) {
-                writeText(config, (node.innerText || node.data).replace(/\n/, '').replace(/\s\s+/g, ' '), topLevelTypeNode, root, callback);
+                let textNode = <CharacterData> node;
+
+                writeText(config, textNode.data.replace(/\n/, '').replace(/\s\s+/g, ' '), topLevelTypeNode, root, callback);
             } else {
                 callback(null);
             }
         }
     };
 
-    let processDefaultNode = makeProcessor(function (config, node, root, callback) {
+    let processDefaultNode = makeProcessor(function (config:Configuration, node:HTMLElement, root:HTMLElement, callback:ProcessorCallback):void {
         var clone;
 
         if (node.getAttribute("data-ignore-tply") === "true") {
@@ -225,9 +224,10 @@
         "wait": makeProcessor(processWaitNode)
     };
 
-    let processNode = function (config, node, root, callback) {
+    let processNode = function (config:Configuration, node:Node, root:HTMLElement, callback:ProcessorCallback) {
         if (node.nodeType === NodeType.element) {
-            let tag = node.tagName.toLowerCase();
+            let element = <HTMLElement> node;
+            let tag = element.tagName.toLowerCase();
 
             let matchingProcessor = processors[tag];
 
@@ -237,7 +237,8 @@
                 processDefaultNode(config, node, root, callback);
             }
         } else if (node.nodeType === NodeType.text) {
-            root.appendChild(document.createTextNode(node.data));
+            let textNode = <CharacterData> node;
+            root.appendChild(document.createTextNode(textNode.data));
             scrollDown(config);
             callback(null);
         } else {
@@ -246,7 +247,7 @@
         }
     };
 
-    let runAnimation = function (config, parent, nodes, root, callback = () => {
+    let runAnimation = function (config:Configuration, parent:HTMLElement, nodes:NodeList, root:HTMLElement, callback:ProcessorCallback = (e) => {
     }) {
         if (nodes.length === 0) {
             callback(parent);
@@ -269,6 +270,11 @@
         processNode(config, nodes[index].cloneNode(true), root, animateRemainingNodes);
     };
 
+    interface Window {
+        tply: {
+            animate(from:HTMLElement, to:HTMLElement, conf:Configuration, callback:ProcessorCallback)
+        }
+    }
     window.tply = window.tply || {
             animate: function (from, to, conf, callback) {
                 runAnimation(conf || {}, from, from.childNodes, to, callback);

@@ -20,7 +20,8 @@
     }
 
     interface IProcessor {
-        (config:IConfiguration,
+        (cancellation:Cancellation,
+         config:IConfiguration,
          node:HTMLElement | Node,
          root:HTMLElement,
          callback:IProcessorCallback,
@@ -38,7 +39,7 @@
 
     class Cancellation {
         private _isCancelled:boolean = false;
-        private cancellationListeners: Array<() => void> = [];
+        private cancellationListeners:Array<() => void> = [];
 
         public cancel():void {
             this._isCancelled = true;
@@ -81,7 +82,8 @@
     };
 
     var makeProcessor = function (processFn:IProcessor):IProcessor {
-        return function (config:IConfiguration,
+        return function (cancellation:Cancellation,
+                         config:IConfiguration,
                          node:HTMLElement,
                          root:HTMLElement,
                          callback:IProcessorCallback) {
@@ -128,7 +130,7 @@
                 }
             }
 
-            processFn(config, node, root, callBackProxy);
+            processFn(cancellation, config, node, root, callBackProxy);
         };
     };
 
@@ -168,7 +170,8 @@
         comment: 8
     };
 
-    let processWaitNode = function (config:IConfiguration,
+    let processWaitNode = function (cancellation:Cancellation,
+                                    config:IConfiguration,
                                     node:HTMLElement,
                                     root:HTMLElement,
                                     callback:IProcessorCallback):void {
@@ -226,7 +229,8 @@
         return charElement;
     };
 
-    let writeText = function (config:IConfiguration,
+    let writeText = function (cancellation:Cancellation,
+                              config:IConfiguration,
                               text:string,
                               typeNode:HTMLElement,
                               element:HTMLElement,
@@ -241,7 +245,7 @@
         let interval = mapCharToInterval(config, typeNode, text[0], text.length === 1);
 
         let finish = function () {
-            writeText(config, text.slice(1), typeNode, element, callback);
+            writeText(cancellation, config, text.slice(1), typeNode, element, callback);
             scrollDown(config);
         };
 
@@ -252,7 +256,8 @@
         }
     };
 
-    let processTypeNode = function (config:IConfiguration,
+    let processTypeNode = function (cancellation:Cancellation,
+                                    config:IConfiguration,
                                     node:Node,
                                     root:HTMLElement,
                                     callback:IProcessorCallback,
@@ -265,21 +270,28 @@
             executeCallbackChain<Node, Node>(
                 node.childNodes,
                 function (node:Node, callback:IVoidCallback) {
-                    processTypeNode(config, node, appendedRoot, callback, topLevelTypeNode);
+                    processTypeNode(cancellation, config, node, appendedRoot, callback, topLevelTypeNode);
                 },
                 callback,
                 null
             );
         } else {
             if (node.nodeType === NodeType.text) {
-                writeText(config, stripWhitespace((<CharacterData> node).data), topLevelTypeNode, root, callback);
+                writeText(
+                    cancellation,
+                    config,
+                    stripWhitespace((<CharacterData> node).data),
+                    topLevelTypeNode,
+                    root,
+                    callback);
             } else {
                 callback(null);
             }
         }
     };
 
-    let processDefaultNode = makeProcessor(function (config:IConfiguration,
+    let processDefaultNode = makeProcessor(function (cancellation:Cancellation,
+                                                     config:IConfiguration,
                                                      node:HTMLElement,
                                                      root:HTMLElement,
                                                      callback:IProcessorCallback):void {
@@ -290,7 +302,7 @@
         if (noAnimateContents) {
             callback(clone);
         } else {
-            runAnimation(config, node, node.childNodes, clone, callback);
+            runAnimation(cancellation, config, node, node.childNodes, clone, callback);
         }
     });
 
@@ -299,7 +311,11 @@
         "wait": makeProcessor(processWaitNode)
     };
 
-    let processNode = function (config:IConfiguration, node:Node, root:HTMLElement, callback:IProcessorCallback) {
+    let processNode = function (cancellation:Cancellation,
+                                config:IConfiguration,
+                                node:Node,
+                                root:HTMLElement,
+                                callback:IProcessorCallback) {
         if (node.nodeType === NodeType.element) {
             let tag = (<HTMLElement>node).tagName.toLowerCase();
             let matchingProcessor = processors[tag] || processDefaultNode;
@@ -314,7 +330,8 @@
         }
     };
 
-    let runAnimation = function (config:IConfiguration,
+    let runAnimation = function (cancellation:Cancellation,
+                                 config:IConfiguration,
                                  parent:HTMLElement,
                                  nodes:NodeList,
                                  root:HTMLElement,
@@ -322,7 +339,7 @@
         executeCallbackChain<Node, Node>(
             nodes,
             function (node:Node, callback:IVoidCallback) {
-                processNode(config, node.cloneNode(true), root, callback);
+                processNode(cancellation, config, node.cloneNode(true), root, callback);
             },
             callback,
             root
@@ -330,8 +347,12 @@
     };
 
     (<any> window).tply = (<any> window).tply || {
-            animate: function (from, to, conf, callback = () => null) {
-                runAnimation(conf || {}, from, from.childNodes, to, callback);
+            animate: function (from, to, conf, callback = () => null):Cancellation {
+                let cancellation = new Cancellation();
+
+                runAnimation(cancellation, conf || {}, from, from.childNodes, to, callback);
+
+                return cancellation;
             }
         };
 })();

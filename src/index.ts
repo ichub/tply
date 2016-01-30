@@ -27,17 +27,27 @@
          ...params:any[]): void
     }
 
-    let executeCallbackChain = function<T>(items:T[], processFn:(item:T, callback:() => void) => void, callback:() => void) {
+    interface IVoidCallback {
+        ():void;
+    }
+
+    interface ISimpleArray<T> {
+        length: number;
+        [index: number]: T;
+    }
+
+    let executeCallbackChain = function<T>(items:ISimpleArray<T>, processFn:(item:T, callback:() => void) => void, callback:() => void) {
         let index = 0;
 
         let process = function () {
             if (index < items.length) {
-                processFn(items[index], process);
-                index++;
+                processFn(items[index++], process);
             } else {
                 callback();
             }
-        }
+        };
+
+        process();
     };
 
     var makeProcessor = function (processFn:Processor):Processor {
@@ -274,20 +284,15 @@
             return;
         }
 
-        var index = 0;
-
-        let animateRemainingNodes = function () {
-            index++;
-
-            if (index < nodes.length) {
-                processNode(config, nodes[index].cloneNode(true), root, animateRemainingNodes);
+        executeCallbackChain(
+            nodes,
+            function(node:Node, callback:IVoidCallback) {
+                processNode(config, node.cloneNode(true), root, callback);
+            },
+            function() {
+                callback(root)
             }
-            else {
-                callback(root);
-            }
-        };
-
-        processNode(config, nodes[index].cloneNode(true), root, animateRemainingNodes);
+        );
     };
 
     (<any> window).tply = (<any> window).tply || {

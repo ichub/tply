@@ -236,15 +236,14 @@
     };
 
     let processDefaultNode = makeProcessor(function (config:Configuration, node:HTMLElement, root:HTMLElement, callback:ProcessorCallback):void {
-        var clone;
+        let noAnimateContents = node.getAttribute("data-ignore-tply") === "true";
 
-        if (node.getAttribute("data-ignore-tply") === "true") {
-            clone = append(config, root, node, null, true);
-            clone.classList.add("fadein");
+        let clone = append(config, root, node, null, noAnimateContents);
+        clone.classList.add("fadein");
+
+        if (noAnimateContents) {
             callback(clone);
         } else {
-            clone = append(config, root, node);
-            clone.classList.add("fadein");
             runAnimation(config, node, node.childNodes, clone, callback);
         }
     });

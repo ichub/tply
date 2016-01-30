@@ -178,32 +178,33 @@
         return charInterval;
     };
 
+    let createCharacterElement = function(char:string): Node {
+        let charElement = document.createElement("span");
+        charElement.classList.add("character");
+        charElement.innerText = char;
+
+        return charElement;
+    };
+
     let writeText = function (config:Configuration, text:string, typeNode:HTMLElement, element:HTMLElement, callback:ProcessorCallback):void {
         if (text === "") {
-            if (typeof callback === "undefined") {
-                return;
-            }
             callback(null);
             return;
         }
 
-        let char = text[0];
+        element.appendChild(createCharacterElement(text[0]));
 
-        let character = document.createElement("span");
-        character.classList.add("character");
-        character.innerText = char;
-        element.appendChild(character);
+        let interval = mapCharToInteval(config, typeNode, text[0], text.length === 1);
 
-        let interval = mapCharToInteval(config, typeNode, char, text.length === 1);
-
-        if (interval === 0) {
+        let finish = function() {
             writeText(config, text.slice(1), typeNode, element, callback);
             scrollDown(config);
+        };
+
+        if (interval === 0) {
+            finish();
         } else {
-            setTimeout(function () {
-                writeText(config, text.slice(1), typeNode, element, callback);
-                scrollDown(config);
-            }, interval);
+            setTimeout(finish, interval);
         }
     };
 

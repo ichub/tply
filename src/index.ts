@@ -81,7 +81,7 @@
         return text.replace(/\n/, '').replace(/\s\s+/g, ' ');
     };
 
-    let proxyFunction = function (original:Function, wrapper:Function) {
+    let makeProxy = function (original:Function, wrapper:Function) {
         return function () {
             let argsArray = Array.prototype.slice.call(arguments);
             argsArray.push(original);
@@ -139,7 +139,7 @@
                 }
             }
 
-            callBackProxy = proxyFunction(callBackProxy, function (element:HTMLElement, originalCallback) {
+            callBackProxy = makeProxy(callBackProxy, function (element:HTMLElement, originalCallback) {
                 if (cancellation.isCancelled) {
                     cancellation.onCancel();
                     return;

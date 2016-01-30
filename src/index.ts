@@ -58,7 +58,7 @@
             if (Array.isArray(config.processing)) {
 
                 for (var k = 0; k < config.processing.length; k++) {
-                    let proc = config.processing[k];
+                    var proc = config.processing[k];
 
                     if (node.tagName.toLowerCase() === proc.tag.toLowerCase()) {
                         if (typeof proc.pre === "function") {
@@ -179,13 +179,13 @@
         } else {
             setTimeout(function () {
                 writeText(config, text.slice(1), typeNode, element, callback);
-                scrollDown();
+                scrollDown(config);
             }, interval);
         }
     };
 
     let processTypeNode = function (config:Configuration, node:Node, root:HTMLElement, callback:ProcessorCallback, topLevelTypeNode:HTMLElement) {
-        topLevelTypeNode = topLevelTypeNode || node;
+        topLevelTypeNode = topLevelTypeNode || <HTMLElement> node;
         let contents = node.childNodes;
 
         if (contents.length >= 1) {
@@ -277,12 +277,7 @@
         processNode(config, nodes[index].cloneNode(true), root, animateRemainingNodes);
     };
 
-    interface Window {
-        tply: {
-            animate(from:HTMLElement, to:HTMLElement, conf:Configuration, callback:ProcessorCallback)
-        }
-    }
-    window.tply = window.tply || {
+    (<any> window).tply = (<any> window).tply || {
             animate: function (from, to, conf, callback) {
                 runAnimation(conf || {}, from, from.childNodes, to, callback);
             }

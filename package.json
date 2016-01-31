@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "babel-preset-es2015": "^6.3.13",
     "command-line-args": "^2.1.4",
     "gulp": "^3.9.0",
+    "gulp-babel": "^6.1.2",
     "gulp-browserify": "^0.5.1",
     "gulp-changed-in-place": "^2.0.3",
     "gulp-cssnano": "^2.1.0",

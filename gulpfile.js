@@ -1,21 +1,22 @@
 "use strict";
 
-let gulp = require("gulp");
-let sass = require("gulp-sass");
-let server = require('gulp-server-livereload');
-let watch = require("gulp-watch");
-let browserify = require('gulp-browserify');
-let glob = require("multi-glob").glob;
-let path = require("path");
-let commandLineArgs = require('command-line-args');
-let gulpif = require('gulp-if');
-let uglify = require('gulp-uglify');
-let cssnano = require('gulp-cssnano');
-let ts = require('gulp-typescript');
-let merge = require('merge2');
-let tslint = require("gulp-tslint");
-let tsfmt = require("gulp-tsfmt");
-let changedInPlace = require("gulp-changed-in-place");
+const gulp = require("gulp");
+const sass = require("gulp-sass");
+const server = require('gulp-server-livereload');
+const watch = require("gulp-watch");
+const browserify = require('gulp-browserify');
+const glob = require("multi-glob").glob;
+const path = require("path");
+const commandLineArgs = require('command-line-args');
+const gulpif = require('gulp-if');
+const uglify = require('gulp-uglify');
+const cssnano = require('gulp-cssnano');
+const ts = require('gulp-typescript');
+const merge = require('merge2');
+const tslint = require("gulp-tslint");
+const tsfmt = require("gulp-tsfmt");
+const changedInPlace = require("gulp-changed-in-place");
+const babel = require('gulp-babel');
 
 let cli = commandLineArgs([
     {name: 'production', alias: 'p', type: Boolean, defaultOption: false}
@@ -51,12 +52,15 @@ gulp.task('ts', function () {
             declaration: true,
             noExternalResolve: true,
             module: "commonjs",
-            target: "es5"
+            target: "es6"
         }));
 
     return merge([
         tsResult.dts.pipe(gulp.dest('dist')),
         tsResult.js
+            .pipe(babel({
+                presets: ['es2015']
+            }))
             .pipe(browserify({
                 insertGlobals: false
             }))
@@ -99,7 +103,8 @@ gulp.task('lint', function () {
 gulp.task('format', () => {
     gulp.src('src/**/*.ts')
         .pipe(tsfmt({
-            options: {}}))
+            options: {}
+        }))
         .pipe(gulp.dest(file => path.dirname(file.path)));
 });
 

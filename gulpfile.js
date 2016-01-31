@@ -50,7 +50,8 @@ gulp.task('ts', function () {
         .pipe(ts({
             declaration: true,
             noExternalResolve: true,
-            module: "commonjs"
+            module: "commonjs",
+            target: "es5"
         }));
 
     return merge([

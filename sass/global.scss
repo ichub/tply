@@ -87,6 +87,7 @@ code {
   padding-top: $margin;
 
   .section {
+    overflow: hidden;
     position: relative;
     background-color: #80d889;
     min-height: 250px;
@@ -97,6 +98,10 @@ code {
     margin-bottom: $margin;
     margin-left: $margin / 2;
     margin-right: $margin / 2;
+
+    img {
+      width: 100px;
+    }
 
     .tply-container {
       z-index: 1;

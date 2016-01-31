@@ -86,7 +86,7 @@
         public onCancel():void {
             this.cancellationListeners.forEach((listener) => {
                 listener();
-            })
+            });
         }
 
         public get isCancelled():boolean {
@@ -258,9 +258,11 @@
                                     callback:IProcessorCallback):void {
         let duration = parseDuration(node.innerText);
 
-        setTimeout(function () {
-            callback(null);
-        }, duration);
+        setTimeout(
+            function () {
+                callback(null);
+            },
+            duration);
     };
 
     let scrollDown = function (config:IConfiguration):void {
@@ -381,22 +383,6 @@
         }
     };
 
-    let processDefaultNode = makeProcessor(function (cancellation:Cancellation,
-                                                     config:IConfiguration,
-                                                     node:HTMLElement,
-                                                     root:HTMLElement,
-                                                     callback:IProcessorCallback):void {
-        let noAnimateContents = node.getAttribute("data-ignore-tply") === "true";
-        let clone = append(config, root, node, null, noAnimateContents);
-        clone.classList.add("fadein");
-
-        if (noAnimateContents) {
-            callback(clone);
-        } else {
-            runAnimation(cancellation, config, node, node.childNodes, clone, callback);
-        }
-    });
-
     let processors = {
         "type": makeProcessor(processTypeNode),
         "wait": makeProcessor(processWaitNode)
@@ -436,6 +422,22 @@
             root
         );
     };
+
+    let processDefaultNode = makeProcessor(function (cancellation:Cancellation,
+                                                     config:IConfiguration,
+                                                     node:HTMLElement,
+                                                     root:HTMLElement,
+                                                     callback:IProcessorCallback):void {
+        let noAnimateContents = node.getAttribute("data-ignore-tply") === "true";
+        let clone = append(config, root, node, null, noAnimateContents);
+        clone.classList.add("fadein");
+
+        if (noAnimateContents) {
+            callback(clone);
+        } else {
+            runAnimation(cancellation, config, node, node.childNodes, clone, callback);
+        }
+    });
 
     (<any> window).tply = (<any> window).tply || {
             animate: function (from, to, conf, callback = () => null):Cancellation {

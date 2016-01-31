@@ -150,3 +150,27 @@ code {
 .robot {
   font-family: $font-monospace;
 }
+
+$button-color: #c44fac;
+
+button {
+  padding: 5px 15px 5px 15px;
+  border: none;
+  border-radius: 2px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  background-color: $button-color;
+  color: white;
+  outline: none;
+  transition: 200ms;
+  cursor: pointer;
+  font-size: inherit;
+
+  &:hover {
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+    background-color: lighten($button-color, 5);
+  }
+
+  &:active {
+    background-color: lighten($button-color, 10);
+  }
+}

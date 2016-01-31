@@ -174,3 +174,42 @@ button {
     background-color: lighten($button-color, 10);
   }
 }
+
+@keyframes wobble {
+  0% {
+    transform: rotate(-10deg);
+  }
+
+  50% {
+    transform: rotate(10deg)
+  }
+
+  100% {
+    transform: rotate(-10deg);
+  }
+}
+
+#big-duck-container {
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &.hidden {
+    display: none;
+  }
+
+  #big-duck {
+    border-radius: 2px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    animation-name: wobble;
+    animation-duration: 50ms;
+    animation-iteration-count: infinite;
+  }
+}

@@ -126,6 +126,7 @@
         </div>
     </div>
 </div>
+<div id="big-duck-container" class="hidden"><img id="big-duck" src="/static/ducks.jpg" alt="duck"></div>
 <div id="animation">
 </div>
 
@@ -133,7 +134,13 @@
     "use strict";
 
     let wobble = function() {
+        var container = document.getElementById("big-duck-container");
 
+        container.classList.remove("hidden");
+
+        setTimeout(function() {
+            container.classList.add("hidden");
+        }, 1000);
     };
 
     let tplyConfiguration = {

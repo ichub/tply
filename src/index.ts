@@ -139,7 +139,7 @@
      * @returns - Function with the same signature as the original one.
      */
     let makeProxy = function<T> (original:T, wrapper:Function):T {
-        return <T> function ():void {
+        return <T> <any> function ():void {
             let argsArray = Array.prototype.slice.call(arguments);
             argsArray.push(original);
 
@@ -190,20 +190,17 @@
             }
 
             if (Array.isArray(config.processing)) {
-
                 for (let k = 0; k < config.processing.length; k++) {
-                    let proc = config.processing[k];
-
-                    if (node.tagName.toLowerCase() === proc.tag.toLowerCase()) {
-                        if (typeof proc.pre === "function") {
-                            proc.pre(node);
+                    if (node.tagName.toLowerCase() === config.processing[k].tag.toLowerCase()) {
+                        if (typeof config.processing[k].pre === "function") {
+                            config.processing[k].pre(node);
                         }
 
-                        if (typeof proc.post === "function") {
+                        if (typeof config.processing[k].post === "function") {
                             callBackProxy = makeProxy<IProcessorCallback>(
                                 callBackProxy,
                                 function (element:HTMLElement, originalCallback:IProcessorCallback):void {
-                                    proc.post(element);
+                                    config.processing[k].post(element);
                                     originalCallback(element);
                                 });
                         }

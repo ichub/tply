@@ -1,3 +1,3 @@
 interface IParseDuration {
-    parse(duration:string):number;
+    (duration:string):number;
 }

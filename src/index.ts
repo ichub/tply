@@ -1,5 +1,5 @@
-(function () {
-    let parseDuration = require("parse-duration");
+(function ():void {
+    let parseDuration:IParseDuration = require("parse-duration");
 
     enum NodeType {
         Element = 1,
@@ -17,12 +17,12 @@
             properties?: any,
             styleClasses?: string,
             style?: string
-        }],
+        }];
         processing?: [{
             tag: string,
             pre: (element:HTMLElement) => void,
             post: (element:HTMLElement) => void
-        }]
+        }];
     }
 
     /**
@@ -30,8 +30,8 @@
      * it yields control back to its parent by calling this function. The `element` parameter
      * is a reference to the element which the processor inserted into the DOM.
      */
-    interface IProcessorCallback {
-        (element:HTMLElement | void): void;
+    interface IProcessorCallback extends Function {
+        (element:HTMLElement | Node | void): void;
     }
 
     /**
@@ -48,7 +48,7 @@
          node:HTMLElement | Node,
          root:HTMLElement,
          callback:IProcessorCallback,
-         ...params:any[]): void
+         ...params:any[]): void;
     }
 
     interface IVoidCallback {
@@ -84,7 +84,7 @@
         }
 
         public onCancel():void {
-            this.cancellationListeners.forEach((listener) => {
+            this.cancellationListeners.forEach((listener:() => void):void => {
                 listener();
             });
         }
@@ -109,11 +109,11 @@
      */
     let executeCallbackChain = function<T, U>(items:ISimpleArray<T>,
                                               processFn:(item:T, callback:() => void) => void,
-                                              callback:(U) => void,
-                                              defaultCallbackParam:U) {
+                                              callback:(param:U) => void,
+                                              defaultCallbackParam:U):void {
         let index = 0;
 
-        let process = function () {
+        let process = function ():void {
             if (index < items.length) {
                 processFn(items[index++], process);
             } else {
@@ -125,7 +125,7 @@
     };
 
     let stripWhitespace = function (text:string):string {
-        return text.replace(/\n/, '').replace(/\s\s+/g, ' ');
+        return text.replace(/\n/, "").replace(/\s\s+/g, " ");
     };
 
     /**
@@ -138,13 +138,13 @@
      * call or don't - up to you.
      * @returns - Function with the same signature as the original one.
      */
-    let makeProxy = function (original:Function, wrapper:Function) {
-        return function () {
+    let makeProxy = function<T> (original:T, wrapper:Function):T {
+        return <T> function ():void {
             let argsArray = Array.prototype.slice.call(arguments);
             argsArray.push(original);
 
             wrapper.apply(this, argsArray);
-        }
+        };
     };
 
     /**
@@ -153,7 +153,7 @@
      * by the configuration. Additionally, stops the animation if it is cancelled.
      * @param processFn
      */
-    var makeProcessor = function (processFn:IProcessor):IProcessor {
+    let makeProcessor = function (processFn:IProcessor):IProcessor {
         return function (cancellation:Cancellation,
                          config:IConfiguration,
                          node:HTMLElement,
@@ -166,17 +166,17 @@
                 return;
             }
 
-            var callBackProxy = callback;
+            let callBackProxy = callback;
 
             for (let i = 0; i < node.attributes.length; i++) {
                 if (!Array.isArray(config.types)) {
                     break;
                 }
 
-                for (var j = 0; j < config.types.length; j++) {
+                for (let j = 0; j < config.types.length; j++) {
                     if (node.attributes[i].name === "data-type") {
                         if (node.attributes[i].value === config.types[j].name) {
-                            for (var propName in config.types[j].properties) {
+                            for (let propName in config.types[j].properties) {
                                 if (config.types[j].properties.hasOwnProperty(propName)) {
                                     node.setAttribute(propName, config.types[j].properties[propName]);
                                 }
@@ -191,8 +191,8 @@
 
             if (Array.isArray(config.processing)) {
 
-                for (var k = 0; k < config.processing.length; k++) {
-                    var proc = config.processing[k];
+                for (let k = 0; k < config.processing.length; k++) {
+                    let proc = config.processing[k];
 
                     if (node.tagName.toLowerCase() === proc.tag.toLowerCase()) {
                         if (typeof proc.pre === "function") {
@@ -200,10 +200,12 @@
                         }
 
                         if (typeof proc.post === "function") {
-                            callBackProxy = makeProxy(callBackProxy, function (element:HTMLElement, originalCallback) {
-                                proc.post(element);
-                                originalCallback(element);
-                            });
+                            callBackProxy = makeProxy<IProcessorCallback>(
+                                callBackProxy,
+                                function (element:HTMLElement, originalCallback:IProcessorCallback):void {
+                                    proc.post(element);
+                                    originalCallback(element);
+                                });
                         }
                     }
                 }
@@ -228,14 +230,14 @@
                            node:HTMLElement,
                            desiredTag:string = null,
                            justCopyIt:boolean = false):HTMLElement {
-        var clone = <HTMLElement>node.cloneNode(true);
+        let clone = <HTMLElement>node.cloneNode(true);
 
         if (!justCopyIt) {
             clone.innerHTML = "";
         }
 
         if (desiredTag !== null) {
-            var clonedInnerHtml = clone.innerHTML;
+            let clonedInnerHtml = clone.innerHTML;
 
             clone = document.createElement(desiredTag);
             clone.innerHTML = clonedInnerHtml;
@@ -259,7 +261,7 @@
         let duration = parseDuration(node.innerText);
 
         setTimeout(
-            function () {
+            function ():void {
                 callback(null);
             },
             duration);
@@ -337,7 +339,7 @@
 
         let interval = mapCharToInterval(config, typeNode, text[0], text.length === 1);
 
-        let finish = function () {
+        let finish = function ():void {
             writeText(cancellation, config, text.slice(1), typeNode, element, callback);
             scrollDown(config);
         };
@@ -354,7 +356,7 @@
                                     node:Node,
                                     root:HTMLElement,
                                     callback:IProcessorCallback,
-                                    topLevelTypeNode:HTMLElement) {
+                                    topLevelTypeNode:HTMLElement):void {
         topLevelTypeNode = topLevelTypeNode || <HTMLElement> node;
 
         if (node.childNodes.length >= 1) {
@@ -362,7 +364,7 @@
 
             executeCallbackChain<Node, Node>(
                 node.childNodes,
-                function (node:Node, callback:IVoidCallback) {
+                function (node:Node, callback:IVoidCallback):void {
                     processTypeNode(cancellation, config, node, appendedRoot, callback, topLevelTypeNode);
                 },
                 callback,
@@ -392,7 +394,7 @@
                                 config:IConfiguration,
                                 node:Node,
                                 root:HTMLElement,
-                                callback:IProcessorCallback) {
+                                callback:IProcessorCallback):void {
         if (node.nodeType === NodeType.Element) {
             let tag = (<HTMLElement>node).tagName.toLowerCase();
             let matchingProcessor = processors[tag] || processDefaultNode;
@@ -412,10 +414,10 @@
                                  parent:HTMLElement,
                                  nodes:NodeList,
                                  root:HTMLElement,
-                                 callback:IProcessorCallback) {
+                                 callback:IProcessorCallback):void {
         executeCallbackChain<Node, Node>(
             nodes,
-            function (node:Node, callback:IVoidCallback) {
+            function (node:Node, callback:IVoidCallback):void {
                 processNode(cancellation, config, node.cloneNode(true), root, callback);
             },
             callback,
@@ -440,10 +442,13 @@
     });
 
     (<any> window).tply = (<any> window).tply || {
-            animate: function (from, to, conf, callback = () => null):Cancellation {
+            animate: function (from:HTMLElement,
+                               to:HTMLElement,
+                               conf:IConfiguration = {},
+                               callback:() => void = () => null):Cancellation {
                 let cancellation = new Cancellation();
 
-                runAnimation(cancellation, conf || {}, from, from.childNodes, to, callback);
+                runAnimation(cancellation, conf, from, from.childNodes, to, callback);
 
                 return cancellation;
             }

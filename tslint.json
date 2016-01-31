@@ -88,7 +88,7 @@
     "trailing-comma": [
       true,
       {
-        "multiline": "always",
+        "multiline": "never",
         "singleline": "never"
       }
     ],
@@ -101,7 +101,6 @@
       "call-signature",
       "parameter",
       "property-declaration",
-      "variable-declaration",
       "member-variable-declaration"
     ],
     "typedef-whitespace": [
@@ -126,7 +125,7 @@
       "ban-keywords"
     ],
     "whitespace": [
-      true,
+      false,
       "check-branch",
       "check-decl",
       "check-operator",

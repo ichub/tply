@@ -43,7 +43,8 @@
      * parameters to themselves on subsequent runs.
      */
     interface IProcessor {
-        (cancellation:Cancellation,
+        (context:AnimationContext,
+         cancellation:Cancellation,
          config:IConfiguration,
          node:HTMLElement | Node,
          root:HTMLElement,
@@ -92,6 +93,10 @@
         public get isCancelled():boolean {
             return this._isCancelled;
         }
+    }
+
+    class AnimationContext {
+
     }
 
     /**
@@ -154,7 +159,8 @@
      * @param processFn
      */
     let makeProcessor = function (processFn:IProcessor):IProcessor {
-        return function (cancellation:Cancellation,
+        return function (context:AnimationContext,
+                         cancellation:Cancellation,
                          config:IConfiguration,
                          node:HTMLElement,
                          root:HTMLElement,
@@ -208,7 +214,7 @@
                 }
             }
 
-            processFn(cancellation, config, node, root, callBackProxy);
+            processFn(context, cancellation, config, node, root, callBackProxy);
         };
     };
 
@@ -250,7 +256,8 @@
         return clone;
     };
 
-    let processWaitNode = function (cancellation:Cancellation,
+    let processWaitNode = function (context:AnimationContext,
+                                    cancellation:Cancellation,
                                     config:IConfiguration,
                                     node:HTMLElement,
                                     root:HTMLElement,
@@ -348,7 +355,8 @@
         }
     };
 
-    let processTypeNode = function (cancellation:Cancellation,
+    let processTypeNode = function (context:AnimationContext,
+                                    cancellation:Cancellation,
                                     config:IConfiguration,
                                     node:Node,
                                     root:HTMLElement,
@@ -362,7 +370,7 @@
             executeCallbackChain<Node, Node>(
                 node.childNodes,
                 function (node:Node, callback:IVoidCallback):void {
-                    processTypeNode(cancellation, config, node, appendedRoot, callback, topLevelTypeNode);
+                    processTypeNode(context, cancellation, config, node, appendedRoot, callback, topLevelTypeNode);
                 },
                 callback,
                 null
@@ -382,12 +390,13 @@
         }
     };
 
-    let processors = {
+    let processors:{[key:string]:IProcessor} = {
         "type": makeProcessor(processTypeNode),
         "wait": makeProcessor(processWaitNode)
     };
 
-    let processNode = function (cancellation:Cancellation,
+    let processNode = function (context:AnimationContext,
+                                cancellation:Cancellation,
                                 config:IConfiguration,
                                 node:Node,
                                 root:HTMLElement,
@@ -395,7 +404,7 @@
         if (node.nodeType === NodeType.Element) {
             let tag = (<HTMLElement>node).tagName.toLowerCase();
             let matchingProcessor = processors[tag] || processDefaultNode;
-            matchingProcessor(cancellation, config, node, root, callback);
+            matchingProcessor(context, cancellation, config, node, root, callback);
         } else if (node.nodeType === NodeType.Text) {
             root.appendChild(document.createTextNode((<CharacterData> node).data));
             scrollDown(config);
@@ -406,7 +415,8 @@
         }
     };
 
-    let runAnimation = function (cancellation:Cancellation,
+    let runAnimation = function (context:AnimationContext,
+                                 cancellation:Cancellation,
                                  config:IConfiguration,
                                  parent:HTMLElement,
                                  nodes:NodeList,
@@ -415,14 +425,15 @@
         executeCallbackChain<Node, Node>(
             nodes,
             function (node:Node, callback:IVoidCallback):void {
-                processNode(cancellation, config, node.cloneNode(true), root, callback);
+                processNode(context, cancellation, config, node.cloneNode(true), root, callback);
             },
             callback,
             root
         );
     };
 
-    let processDefaultNode = makeProcessor(function (cancellation:Cancellation,
+    let processDefaultNode = makeProcessor(function (context:AnimationContext,
+                                                     cancellation:Cancellation,
                                                      config:IConfiguration,
                                                      node:HTMLElement,
                                                      root:HTMLElement,
@@ -434,7 +445,7 @@
         if (noAnimateContents) {
             callback(clone);
         } else {
-            runAnimation(cancellation, config, node, node.childNodes, clone, callback);
+            runAnimation(context, cancellation, config, node, node.childNodes, clone, callback);
         }
     });
 
@@ -444,8 +455,9 @@
                                conf:IConfiguration = {},
                                callback:() => void = () => null):Cancellation {
                 let cancellation = new Cancellation();
+                let context = new AnimationContext();
 
-                runAnimation(cancellation, conf, from, from.childNodes, to, callback);
+                runAnimation(context, cancellation, conf, from, from.childNodes, to, callback);
 
                 return cancellation;
             }

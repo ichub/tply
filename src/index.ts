@@ -114,6 +114,27 @@
             this._callback = callback;
         }
 
+        public clone():AnimationContext {
+            return new AnimationContext(
+                this._cancellation,
+                this._config,
+                this._currentNode,
+                this._currentRoot,
+                this._callback);
+        }
+
+        public withRoot(root:HTMLElement):AnimationContext {
+            const clone = this.clone();
+            clone._currentRoot = root;
+            return clone;
+        }
+
+        public withNode(node:Node) {
+            const clone = this.clone();
+            clone._currentNode = node;
+            return clone;
+        }
+
         get cancellation():Cancellation {
             return this._cancellation;
         }
@@ -491,7 +512,7 @@
                                conf:IConfiguration = {},
                                callback:() => void = () => null):Cancellation {
                 let cancellation = new Cancellation();
-                let context = new AnimationContext();
+                let context = new AnimationContext(cancellation, conf, from, to, callback);
 
                 runAnimation(context, cancellation, conf, from, from.childNodes, to, callback);
 

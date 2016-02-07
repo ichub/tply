@@ -96,7 +96,43 @@
     }
 
     class AnimationContext {
+        private _cancellation:Cancellation;
+        private _config:IConfiguration;
+        private _currentNode:Node;
+        private _currentRoot:HTMLElement;
+        private _callback:IProcessorCallback;
 
+        constructor(cancellation:Cancellation,
+                    config:IConfiguration,
+                    currentNode:Node,
+                    currentRoot:HTMLElement,
+                    callback:IProcessorCallback) {
+            this._cancellation = cancellation;
+            this._config = config;
+            this._currentNode = currentNode;
+            this._currentRoot = currentRoot;
+            this._callback = callback;
+        }
+
+        get cancellation():Cancellation {
+            return this._cancellation;
+        }
+
+        get config():IConfiguration {
+            return this._config;
+        }
+
+        get currentNode():Node {
+            return this._currentNode;
+        }
+
+        get currentRoot():HTMLElement {
+            return this._currentRoot;
+        }
+
+        get callback():IProcessorCallback {
+            return this._callback;
+        }
     }
 
     /**

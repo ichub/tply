@@ -158,6 +158,10 @@
             return <HTMLElement> this._from;
         }
 
+        get fromAsCharacterData(): CharacterData {
+            return <CharacterData> this._from;
+        }
+
         get to():HTMLElement {
             return this._to;
         }
@@ -451,17 +455,21 @@
     };
 
     let processNode = function (context:AnimationContext):void {
-        if (context.from.nodeType === NodeType.Element) {
-            let tag = (<HTMLElement>context.from).tagName.toLowerCase();
-            let matchingProcessor = processors[tag] || processDefaultNode;
-            matchingProcessor(context);
-        } else if (context.from.nodeType === NodeType.Text) {
-            context.to.appendChild(document.createTextNode((<CharacterData> context.from).data));
-            scrollDown(context.config);
-            context.callback(null);
-        } else {
-            scrollDown(context.config);
-            context.callback(null);
+        switch (context.from.nodeType) {
+            case NodeType.Element:
+                let tag = context.fromAsElement.tagName.toLowerCase();
+                let matchingProcessor = processors[tag] || processDefaultNode;
+                matchingProcessor(context);
+                break;
+            case NodeType.Text:
+                context.to.appendChild(document.createTextNode(context.fromAsCharacterData.data));
+                scrollDown(context.config);
+                context.callback(null);
+                break;
+            default:
+                scrollDown(context.config);
+                context.callback(null);
+                break;
         }
     };
 
@@ -469,9 +477,10 @@
         executeCallbackChain<Node, Node>(
             context.from.childNodes,
             function (node:Node, callback:IVoidCallback):void {
-                const clone = node.cloneNode(true);
-
-                processNode(context.withFrom(<HTMLElement> clone).withCallback(callback));
+                processNode(
+                    context
+                        .withFrom(node.cloneNode(true))
+                        .withCallback(callback));
             },
             context.callback,
             context.to

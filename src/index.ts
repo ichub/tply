@@ -43,13 +43,7 @@
      * parameters to themselves on subsequent runs.
      */
     interface IProcessor {
-        (context:AnimationContext,
-         cancellation:Cancellation,
-         config:IConfiguration,
-         node:HTMLElement | Node,
-         root:HTMLElement,
-         callback:IProcessorCallback,
-         ...params:any[]): void;
+        (context:AnimationContext): void;
     }
 
     interface IVoidCallback {
@@ -237,59 +231,49 @@
      * @param processFn
      */
     let makeProcessor = function (processFn:IProcessor):IProcessor {
-        return function (context:AnimationContext,
-                         cancellation:Cancellation,
-                         config:IConfiguration,
-                         node:HTMLElement,
-                         root:HTMLElement,
-                         callback:IProcessorCallback):void {
-
-            if (context.from != node || context.to != root) {
-                debugger;
-            }
-
-            if (cancellation.isCancelled) {
-                cancellation.onCancel();
+        return function (context:AnimationContext):void {
+            if (context.cancellation.isCancelled) {
+                context.cancellation.onCancel();
                 // not calling the callback effectively
                 // stops the animation - this is deliberate.
                 return;
             }
 
-            let callBackProxy = callback;
+            let callBackProxy = context.callback;
 
-            for (let i = 0; i < node.attributes.length; i++) {
-                if (!Array.isArray(config.types)) {
+            for (let i = 0; i < context.fromAsElement.attributes.length; i++) {
+                if (!Array.isArray(context.config.types)) {
                     break;
                 }
 
-                for (let j = 0; j < config.types.length; j++) {
-                    if (node.attributes[i].name === "data-type") {
-                        if (node.attributes[i].value === config.types[j].name) {
-                            for (let propName in config.types[j].properties) {
-                                if (config.types[j].properties.hasOwnProperty(propName)) {
-                                    node.setAttribute(propName, config.types[j].properties[propName]);
+                for (let j = 0; j < context.config.types.length; j++) {
+                    if (context.from.attributes[i].name === "data-type") {
+                        if (context.from.attributes[i].value === context.config.types[j].name) {
+                            for (let propName in context.config.types[j].properties) {
+                                if (context.config.types[j].properties.hasOwnProperty(propName)) {
+                                    context.fromAsElement.setAttribute(propName, context.config.types[j].properties[propName]);
                                 }
                             }
 
-                            node.classList.add(config.types[j].styleClasses || "");
-                            node.setAttribute("style", node.getAttribute("style") + ";" + config.types[j].style);
+                            context.fromAsElement.classList.add(context.config.types[j].styleClasses || "");
+                            context.fromAsElement.setAttribute("style", context.fromAsElement.getAttribute("style") + ";" + context.config.types[j].style);
                         }
                     }
                 }
             }
 
-            if (Array.isArray(config.processing)) {
-                for (let k = 0; k < config.processing.length; k++) {
-                    if (node.tagName.toLowerCase() === config.processing[k].tag.toLowerCase()) {
-                        if (typeof config.processing[k].pre === "function") {
-                            config.processing[k].pre(node);
+            if (Array.isArray(context.config.processing)) {
+                for (let k = 0; k < context.config.processing.length; k++) {
+                    if (context.fromAsElement.tagName.toLowerCase() === context.config.processing[k].tag.toLowerCase()) {
+                        if (typeof context.config.processing[k].pre === "function") {
+                            context.config.processing[k].pre(context.from);
                         }
 
-                        if (typeof config.processing[k].post === "function") {
+                        if (typeof context.config.processing[k].post === "function") {
                             callBackProxy = makeProxy<IProcessorCallback>(
                                 callBackProxy,
                                 function (element:HTMLElement, originalCallback:IProcessorCallback):void {
-                                    config.processing[k].post(element);
+                                    context.config.processing[k].post(element);
                                     originalCallback(element);
                                 });
                         }
@@ -297,7 +281,7 @@
                 }
             }
 
-            processFn(context.withCallback(callBackProxy), cancellation, config, node, root, callBackProxy);
+            processFn(context.withCallback(callBackProxy));
         };
     };
 
@@ -339,12 +323,7 @@
         return clone;
     };
 
-    let processWaitNode = function (context:AnimationContext,
-                                    cancellation:Cancellation,
-                                    config:IConfiguration,
-                                    node:HTMLElement,
-                                    root:HTMLElement,
-                                    callback:IProcessorCallback):void {
+    let processWaitNode = function (context:AnimationContext):void {
         let duration = parseDuration(context.fromAsElement.innerText);
 
         setTimeout(
@@ -438,99 +417,76 @@
         }
     };
 
-    let processTypeNode = function (context:AnimationContext,
-                                    cancellation:Cancellation,
-                                    config:IConfiguration,
-                                    node:Node,
-                                    root:HTMLElement,
-                                    callback:IProcessorCallback,
-                                    topLevelTypeNode:HTMLElement):void {
-        topLevelTypeNode = topLevelTypeNode || <HTMLElement> node;
+    let processTypeNode = function (context:AnimationContext):void {
+            if (context.from.childNodes.length >= 1) {
+                let appendedRoot = append(context.config, context.to, context.fromAsElement);
 
-        if (node.childNodes.length >= 1) {
-            let appendedRoot = append(config, context.to, context.fromAsElement);
-
-            executeCallbackChain<Node, Node>(
-                context.from.childNodes,
-                function (node:Node, callback:IVoidCallback):void {
-                    processTypeNode(context.withTo(appendedRoot).withFrom(node).withCallback(callback).withExtra(topLevelTypeNode), cancellation, config, node, appendedRoot, callback, topLevelTypeNode);
-                },
-                context.callback,
-                null
-            );
-        } else {
-            if (context.from.nodeType === NodeType.Text) {
-                writeText(
-                    context.cancellation,
-                    context.config,
-                    stripWhitespace((<CharacterData> context.from).data),
-                    context.extra,
-                    context.to,
-                    context.callback);
+                executeCallbackChain<Node, Node>(
+                    context.from.childNodes,
+                    function (node:Node, callback:IVoidCallback):void {
+                        processTypeNode(context.withTo(appendedRoot).withFrom(node).withCallback(callback).withExtra(context.extra || context.from));
+                    },
+                    context.callback,
+                    null
+                );
             } else {
-                callback(null);
+                if (context.from.nodeType === NodeType.Text) {
+                    writeText(
+                        context.cancellation,
+                        context.config,
+                        stripWhitespace((<CharacterData> context.from).data),
+                        context.extra || context.from,
+                        context.to,
+                        context.callback);
+                } else {
+                    context.callback(null);
+                }
             }
         }
-    };
+        ;
 
     let processors:{[key:string]:IProcessor} = {
         "type": makeProcessor(processTypeNode),
         "wait": makeProcessor(processWaitNode)
     };
 
-    let processNode = function (context:AnimationContext,
-                                cancellation:Cancellation,
-                                config:IConfiguration,
-                                node:Node,
-                                root:HTMLElement,
-                                callback:IProcessorCallback):void {
+    let processNode = function (context:AnimationContext):void {
         if (context.from.nodeType === NodeType.Element) {
             let tag = (<HTMLElement>context.from).tagName.toLowerCase();
             let matchingProcessor = processors[tag] || processDefaultNode;
-            matchingProcessor(context, cancellation, config, node, root, callback);
-        } else if (node.nodeType === NodeType.Text) {
-            root.appendChild(document.createTextNode((<CharacterData> context.from).data));
-            scrollDown(config);
-            callback(null);
+            matchingProcessor(context);
+        } else if (context.from.nodeType === NodeType.Text) {
+            context.to.appendChild(document.createTextNode((<CharacterData> context.from).data));
+            scrollDown(context.config);
+            context.callback(null);
         } else {
-            scrollDown(config);
-            callback(null);
+            scrollDown(context.config);
+            context.callback(null);
         }
     };
 
-    let runAnimation = function (context:AnimationContext,
-                                 cancellation:Cancellation,
-                                 config:IConfiguration,
-                                 parent:HTMLElement,
-                                 nodes:NodeList,
-                                 root:HTMLElement,
-                                 callback:IProcessorCallback):void {
+    let runAnimation = function (context:AnimationContext):void {
         executeCallbackChain<Node, Node>(
             context.from.childNodes,
             function (node:Node, callback:IVoidCallback):void {
                 const clone = node.cloneNode(true);
 
-                processNode(context.withFrom(<HTMLElement> clone).withCallback(callback), cancellation, config, clone, root, callback);
+                processNode(context.withFrom(<HTMLElement> clone).withCallback(callback));
             },
             context.callback,
             context.to
         );
     };
 
-    let processDefaultNode = makeProcessor(function (context:AnimationContext,
-                                                     cancellation:Cancellation,
-                                                     config:IConfiguration,
-                                                     node:HTMLElement,
-                                                     root:HTMLElement,
-                                                     callback:IProcessorCallback):void {
-        let noAnimateContents = node.getAttribute("data-ignore-tply") === "true";
-        let clone = append(config, root, node, null, noAnimateContents);
+    let processDefaultNode = makeProcessor(function (context:AnimationContext):void {
+        let noAnimateContents = context.fromAsElement.getAttribute("data-ignore-tply") === "true";
+        let clone = append(context.config, context.to, context.fromAsElement, null, noAnimateContents);
         clone.classList.add("fadein");
 
         if (noAnimateContents) {
-            callback(clone);
+            context.callback(clone);
         } else {
-            runAnimation(context.withTo(clone), cancellation, config, node, node.childNodes, clone, callback);
+            runAnimation(context.withTo(clone));
         }
     });
 
@@ -542,7 +498,7 @@
                 let cancellation = new Cancellation();
                 let context = new AnimationContext(cancellation, conf, from, to, callback);
 
-                runAnimation(context, cancellation, conf, from, from.childNodes, to, callback);
+                runAnimation(context);
 
                 return cancellation;
             }

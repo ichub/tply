@@ -186,30 +186,16 @@
         }
     }
 
-    /**
-     * Since the DOM is a tree, and to process a node we need to process its children too. Since
-     * processing each node could take an arbitrary amount of time (ie. it is asynchronous,
-     * we need to be able to chain together the processing of nodes. This method processes each
-     * element in a given array with a given function, handing off execution to process the next
-     * element after the completion of processing of the previous one. At the end, after the final
-     * element is processed, this function calls the `callback` method with the `defaultCallbackParam`
-     * as the value.
-     * @param items - An array-like object of items to process.
-     * @param processFn - A function that processes an item, and calls a callback after finishing.
-     * @param callback - Function to call after all elements have been processed.
-     * @param defaultCallbackParam - The default value to pass the `callback` function.
-     */
-    let executeCallbackChain = function<T, U>(items:ISimpleArray<T>,
-                                              processFn:(item:T, callback:() => void) => void,
-                                              callback:(param:U) => void,
-                                              defaultCallbackParam:U):void {
+    let asynchronouslyProcessNodes = function (context:AnimationContext,
+                                               processFn:(item:Node, callback:() => void) => void,
+                                               callbackParam:Node = null):void {
         let index = 0;
 
         const processNextItem = function ():void {
-            if (index < items.length) {
-                processFn(items[index++], processNextItem);
+            if (index < context.from.childNodes.length) {
+                processFn(context.from.childNodes[index++], processNextItem);
             } else {
-                callback(defaultCallbackParam);
+                context.callback(callbackParam);
             }
         };
 
@@ -427,14 +413,11 @@
             case NodeType.Element:
                 const appendedRoot = append(context.to, context.fromAsElement);
 
-                executeCallbackChain<Node, Node>(
-                    context.from.childNodes,
+                asynchronouslyProcessNodes<Node, Node>(
+                    context,
                     function (node:Node, callback:IVoidCallback):void {
                         processTypeNode(context.withTo(appendedRoot).withFrom(node).withCallback(callback).withExtra(context.extra || context.from));
-                    },
-                    context.callback,
-                    null
-                );
+                    });
                 break;
             case NodeType.Text:
                 writeText(context, stripWhitespace(context.fromAsCharacterData.data));
@@ -470,17 +453,15 @@
     };
 
     const runAnimation = function (context:AnimationContext):void {
-        executeCallbackChain<Node, Node>(
-            context.from.childNodes,
+        asynchronouslyProcessNodes<Node, Node>(
+            context,
             function (node:Node, callback:IVoidCallback):void {
                 processNode(
                     context
                         .withFrom(node.cloneNode(true))
                         .withCallback(callback));
             },
-            context.callback,
-            context.to
-        );
+            context.to);
     };
 
     const processDefaultNode = makeProcessor(function (context:AnimationContext):void {

@@ -98,9 +98,10 @@
     class AnimationContext {
         private _cancellation:Cancellation;
         private _config:IConfiguration;
-        private _currentNode:Node;
-        private _currentRoot:HTMLElement;
+        private _from:Node;
+        private _to:HTMLElement;
         private _callback:IProcessorCallback;
+        private _extra:any;
 
         constructor(cancellation:Cancellation,
                     config:IConfiguration,
@@ -109,8 +110,8 @@
                     callback:IProcessorCallback) {
             this._cancellation = cancellation;
             this._config = config;
-            this._currentNode = currentNode;
-            this._currentRoot = currentRoot;
+            this._from = currentNode;
+            this._to = currentRoot;
             this._callback = callback;
         }
 
@@ -118,20 +119,32 @@
             return new AnimationContext(
                 this._cancellation,
                 this._config,
-                this._currentNode,
-                this._currentRoot,
+                this._from,
+                this._to,
                 this._callback);
         }
 
-        public withRoot(root:HTMLElement):AnimationContext {
+        public withFrom(root:Node):AnimationContext {
             const clone = this.clone();
-            clone._currentRoot = root;
+            clone._from = root;
             return clone;
         }
 
-        public withNode(node:Node) {
+        public withTo(node:HTMLElement) {
             const clone = this.clone();
-            clone._currentNode = node;
+            clone._to = node;
+            return clone;
+        }
+
+        public withCallback(callback:IProcessorCallback):AnimationContext {
+            const clone = this.clone();
+            clone._callback = callback;
+            return clone;
+        }
+
+        public withExtra(extra:any):AnimationContext {
+            const clone = this.clone();
+            clone._extra = extra;
             return clone;
         }
 
@@ -143,16 +156,20 @@
             return this._config;
         }
 
-        get currentNode():Node {
-            return this._currentNode;
+        get from():Node {
+            return this._from;
         }
 
-        get currentRoot():HTMLElement {
-            return this._currentRoot;
+        get to():HTMLElement {
+            return this._to;
         }
 
         get callback():IProcessorCallback {
             return this._callback;
+        }
+
+        get extra():any {
+            return this._extra;
         }
     }
 
@@ -222,6 +239,11 @@
                          node:HTMLElement,
                          root:HTMLElement,
                          callback:IProcessorCallback):void {
+
+            if (context.from != node || context.to != root) {
+                debugger;
+            }
+
             if (cancellation.isCancelled) {
                 cancellation.onCancel();
                 // not calling the callback effectively
@@ -271,7 +293,7 @@
                 }
             }
 
-            processFn(context, cancellation, config, node, root, callBackProxy);
+            processFn(context.withCallback(callBackProxy), cancellation, config, node, root, callBackProxy);
         };
     };
 
@@ -427,7 +449,7 @@
             executeCallbackChain<Node, Node>(
                 node.childNodes,
                 function (node:Node, callback:IVoidCallback):void {
-                    processTypeNode(context, cancellation, config, node, appendedRoot, callback, topLevelTypeNode);
+                    processTypeNode(context.withTo(appendedRoot).withCallback(callback).withExtra(topLevelTypeNode), cancellation, config, node, appendedRoot, callback, topLevelTypeNode);
                 },
                 callback,
                 null
@@ -482,7 +504,9 @@
         executeCallbackChain<Node, Node>(
             nodes,
             function (node:Node, callback:IVoidCallback):void {
-                processNode(context, cancellation, config, node.cloneNode(true), root, callback);
+                const clone = node.cloneNode(true);
+
+                processNode(context.withFrom(<HTMLElement> clone).withCallback(callback), cancellation, config, clone, root, callback);
             },
             callback,
             root
@@ -502,7 +526,7 @@
         if (noAnimateContents) {
             callback(clone);
         } else {
-            runAnimation(context, cancellation, config, node, node.childNodes, clone, callback);
+            runAnimation(context.withTo(clone), cancellation, config, node, node.childNodes, clone, callback);
         }
     });
 

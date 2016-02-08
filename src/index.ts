@@ -410,9 +410,18 @@
             duration);
     };
 
+    const processClearNode = function (context:AnimationContext):void {
+        for (let i = 0; i < context.to.childNodes.length; i++) {
+            context.to.removeChild(context.to.childNodes[i]);
+        }
+
+        context.callback(null);
+    };
+
     const processors:{[key:string]:IElementProcessor} = {
         "type": makeProcessor(processTypeNode),
-        "wait": makeProcessor(processWaitNode)
+        "wait": makeProcessor(processWaitNode),
+        "clear": makeProcessor(processClearNode)
     };
 
     const processDefaultNode = makeProcessor(function (context:AnimationContext):void {

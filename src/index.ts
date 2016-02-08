@@ -412,11 +412,15 @@
         switch (context.from.nodeType) {
             case NodeType.Element:
                 const appendedRoot = append(context.to, context.fromAsElement);
-
                 asynchronouslyProcessNodes<Node, Node>(
                     context,
                     function (node:Node, callback:IVoidCallback):void {
-                        processTypeNode(context.withTo(appendedRoot).withFrom(node).withCallback(callback).withExtra(context.extra || context.from));
+                        processTypeNode(
+                            context
+                                .withTo(appendedRoot)
+                                .withFrom(node)
+                                .withCallback(callback)
+                                .withExtra(context.extra || context.from));
                     });
                 break;
             case NodeType.Text:

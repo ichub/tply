@@ -1,5 +1,5 @@
 (function ():void {
-    let parseDuration:IParseDuration = require("parse-duration");
+    const parseDuration:IParseDuration = require("parse-duration");
 
     enum NodeType {
         Element = 1,
@@ -194,7 +194,7 @@
                                               defaultCallbackParam:U):void {
         let index = 0;
 
-        let process = function ():void {
+        const process = function ():void {
             if (index < items.length) {
                 processFn(items[index++], process);
             } else {
@@ -221,7 +221,7 @@
      */
     let makeProxy = function<T> (original:T, wrapper:Function):T {
         return <T> <any> function ():void {
-            let argsArray = Array.prototype.slice.call(arguments);
+            const argsArray = Array.prototype.slice.call(arguments);
             argsArray.push(original);
 
             wrapper.apply(this, argsArray);
@@ -299,19 +299,19 @@
      * @param desiredTag - The desired tag that the clone should be (ie. 'div', 'a', 'span', etc.)
      * @param justCopyIt - If true, copy the children too, if false do not copy the children.
      */
-    let append = function (config:IConfiguration,
+    const append = function (config:IConfiguration,
                            root:HTMLElement,
                            node:HTMLElement,
                            desiredTag:string = null,
                            justCopyIt:boolean = false):HTMLElement {
-        let clone = <HTMLElement>node.cloneNode(true);
+        let clone = <HTMLElement> node.cloneNode(true);
 
         if (!justCopyIt) {
             clone.innerHTML = "";
         }
 
         if (desiredTag !== null) {
-            let clonedInnerHtml = clone.innerHTML;
+            const clonedInnerHtml = clone.innerHTML;
 
             clone = document.createElement(desiredTag);
             clone.innerHTML = clonedInnerHtml;
@@ -327,8 +327,8 @@
         return clone;
     };
 
-    let processWaitNode = function (context:AnimationContext):void {
-        let duration = parseDuration(context.fromAsElement.innerText);
+    const processWaitNode = function (context:AnimationContext):void {
+        const duration = parseDuration(context.fromAsElement.innerText);
 
         setTimeout(
             function ():void {
@@ -337,25 +337,25 @@
             duration);
     };
 
-    let scrollDown = function (config:IConfiguration):void {
+    const scrollDown = function (config:IConfiguration):void {
         return;
         window.scroll(0, document.documentElement.offsetHeight);
     };
 
-    let mapFirstCharToInterval = function (context:AnimationContext, text:string):number {
+    const mapFirstCharToInterval = function (context:AnimationContext, text:string):number {
         const referenceTypeNode:HTMLElement = context.extra || context.from;
 
-        let defaultCharInterval = "50ms";
-        let defaultPeriodInterval = "500ms";
-        let defaultCommaInterval = "300ms";
-        let defaultEndInterval = "0ms";
-        let defaultWordInterval = "0ms";
+        const defaultCharInterval = "50ms";
+        const defaultPeriodInterval = "500ms";
+        const defaultCommaInterval = "300ms";
+        const defaultEndInterval = "0ms";
+        const defaultWordInterval = "0ms";
 
-        let charInterval = parseDuration(referenceTypeNode.getAttribute("data-char-interval") || defaultCharInterval);
-        let periodInterval = parseDuration(referenceTypeNode.getAttribute("data-period-interval") || defaultPeriodInterval);
-        let commaInterval = parseDuration(referenceTypeNode.getAttribute("data-comma-interval") || defaultCommaInterval);
-        let endInterval = parseDuration(referenceTypeNode.getAttribute("data-end-interval") || defaultEndInterval);
-        let wordInterval = parseDuration(referenceTypeNode.getAttribute("data-word-interval") || defaultWordInterval);
+        const charInterval = parseDuration(referenceTypeNode.getAttribute("data-char-interval") || defaultCharInterval);
+        const periodInterval = parseDuration(referenceTypeNode.getAttribute("data-period-interval") || defaultPeriodInterval);
+        const commaInterval = parseDuration(referenceTypeNode.getAttribute("data-comma-interval") || defaultCommaInterval);
+        const endInterval = parseDuration(referenceTypeNode.getAttribute("data-end-interval") || defaultEndInterval);
+        const wordInterval = parseDuration(referenceTypeNode.getAttribute("data-word-interval") || defaultWordInterval);
 
         const char = text[0];
 
@@ -372,8 +372,8 @@
         return charInterval;
     };
 
-    let createCharacterElement = function (char:string):Node {
-        let charElement = document.createElement("span");
+    const createCharacterElement = function (char:string):Node {
+        const charElement = document.createElement("span");
         charElement.classList.add("character");
         charElement.innerText = char;
 
@@ -383,7 +383,7 @@
     /**
      * This is where the magic happens - here we type out text into an HTML Element.
      */
-    let writeText = function (context:AnimationContext, text:string):void {
+    const writeText = function (context:AnimationContext, text:string):void {
         if (text === "") {
             context.callback(null);
             return;
@@ -398,9 +398,9 @@
 
         context.to.appendChild(createCharacterElement(text[0]));
 
-        let interval = mapFirstCharToInterval(context, text);
+        const interval = mapFirstCharToInterval(context, text);
 
-        let finish = function ():void {
+        const finish = function ():void {
             writeText(context, text.slice(1));
             scrollDown(context.config);
         };
@@ -412,10 +412,10 @@
         }
     };
 
-    let processTypeNode = function (context:AnimationContext):void {
+    const processTypeNode = function (context:AnimationContext):void {
         switch (context.from.nodeType) {
             case NodeType.Element:
-                let appendedRoot = append(context.config, context.to, context.fromAsElement);
+                const appendedRoot = append(context.config, context.to, context.fromAsElement);
 
                 executeCallbackChain<Node, Node>(
                     context.from.childNodes,
@@ -435,16 +435,16 @@
         }
     };
 
-    let processors:{[key:string]:IProcessor} = {
+    const processors:{[key:string]:IProcessor} = {
         "type": makeProcessor(processTypeNode),
         "wait": makeProcessor(processWaitNode)
     };
 
-    let processNode = function (context:AnimationContext):void {
+    const processNode = function (context:AnimationContext):void {
         switch (context.from.nodeType) {
             case NodeType.Element:
-                let tag = context.fromAsElement.tagName.toLowerCase();
-                let matchingProcessor = processors[tag] || processDefaultNode;
+                const tag = context.fromAsElement.tagName.toLowerCase();
+                const matchingProcessor = processors[tag] || processDefaultNode;
                 matchingProcessor(context);
                 break;
             case NodeType.Text:
@@ -459,7 +459,7 @@
         }
     };
 
-    let runAnimation = function (context:AnimationContext):void {
+    const runAnimation = function (context:AnimationContext):void {
         executeCallbackChain<Node, Node>(
             context.from.childNodes,
             function (node:Node, callback:IVoidCallback):void {
@@ -473,9 +473,9 @@
         );
     };
 
-    let processDefaultNode = makeProcessor(function (context:AnimationContext):void {
-        let noAnimateContents = context.fromAsElement.getAttribute("data-ignore-tply") === "true";
-        let clone = append(context.config, context.to, context.fromAsElement, null, noAnimateContents);
+    const processDefaultNode = makeProcessor(function (context:AnimationContext):void {
+        const noAnimateContents = context.fromAsElement.getAttribute("data-ignore-tply") === "true";
+        const clone = append(context.config, context.to, context.fromAsElement, null, noAnimateContents);
         clone.classList.add("fadein");
 
         if (noAnimateContents) {
@@ -490,7 +490,7 @@
                                to:HTMLElement,
                                conf:IConfiguration = {},
                                callback:() => void = () => null):Cancellation {
-                let cancellation = new Cancellation();
+                const cancellation = new Cancellation();
                 runAnimation(new AnimationContext(cancellation, conf, from, to, callback));
                 return cancellation;
             }

@@ -298,16 +298,6 @@
         return clone;
     };
 
-    const processWaitNode = function (context:AnimationContext):void {
-        const duration = parseDuration(context.fromAsElement.innerText);
-
-        setTimeout(
-            function ():void {
-                context.callback(null);
-            },
-            duration);
-    };
-
     const scrollDown = function (config:IConfiguration):void {
         return;
         window.scroll(0, document.documentElement.offsetHeight);
@@ -406,10 +396,32 @@
         }
     };
 
+    const processWaitNode = function (context:AnimationContext):void {
+        const duration = parseDuration(context.fromAsElement.innerText);
+
+        setTimeout(
+            function ():void {
+                context.callback(null);
+            },
+            duration);
+    };
+
     const processors:{[key:string]:IElementProcessor} = {
         "type": makeProcessor(processTypeNode),
         "wait": makeProcessor(processWaitNode)
     };
+
+    const processDefaultNode = makeProcessor(function (context:AnimationContext):void {
+        const noAnimateContents = context.fromAsElement.getAttribute("data-ignore-tply") === "true";
+        const clone = append(context.to, context.fromAsElement, null, noAnimateContents);
+        clone.classList.add("fadein");
+
+        if (noAnimateContents) {
+            context.callback(clone);
+        } else {
+            runAnimation(context.withTo(clone));
+        }
+    });
 
     const processNode = function (context:AnimationContext):void {
         switch (context.from.nodeType) {
@@ -441,18 +453,6 @@
             },
             context.to);
     };
-
-    const processDefaultNode = makeProcessor(function (context:AnimationContext):void {
-        const noAnimateContents = context.fromAsElement.getAttribute("data-ignore-tply") === "true";
-        const clone = append(context.to, context.fromAsElement, null, noAnimateContents);
-        clone.classList.add("fadein");
-
-        if (noAnimateContents) {
-            context.callback(clone);
-        } else {
-            runAnimation(context.withTo(clone));
-        }
-    });
 
     (<any> window).tply = (<any> window).tply || {
             animate: function (from:HTMLElement,

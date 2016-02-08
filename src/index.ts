@@ -243,7 +243,7 @@
                 for (let k = 0; k < context.config.processing.length; k++) {
                     if (context.fromAsElement.tagName.toLowerCase() === context.config.processing[k].tag.toLowerCase()) {
                         if (typeof context.config.processing[k].pre === "function") {
-                            context.config.processing[k].pre(context.from);
+                            context.config.processing[k].pre(context.fromAsElement);
                         }
 
                         if (typeof context.config.processing[k].post === "function") {
@@ -376,7 +376,7 @@
         switch (context.from.nodeType) {
             case NodeType.Element:
                 const appendedRoot = append(context.to, context.fromAsElement);
-                asynchronouslyProcessNodes<Node, Node>(
+                asynchronouslyProcessNodes(
                     context,
                     function (node:Node, callback:IVoidCallback):void {
                         processTypeNode(
@@ -443,7 +443,7 @@
     };
 
     const runAnimation = function (context:AnimationContext):void {
-        asynchronouslyProcessNodes<Node, Node>(
+        asynchronouslyProcessNodes(
             context,
             function (node:Node, callback:IVoidCallback):void {
                 processNode(

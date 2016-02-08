@@ -158,7 +158,7 @@
             return <HTMLElement> this._from;
         }
 
-        get fromAsCharacterData(): CharacterData {
+        get fromAsCharacterData():CharacterData {
             return <CharacterData> this._from;
         }
 
@@ -387,31 +387,28 @@
     /**
      * This is where the magic happens - here we type out text into an HTML Element.
      */
-    let writeText = function (cancellation:Cancellation,
-                              config:IConfiguration,
-                              text:string,
-                              typeNode:HTMLElement,
-                              element:HTMLElement,
-                              callback:IProcessorCallback):void {
+    let writeText = function (context:AnimationContext, text:string):void {
+        const typeNode = context.extra || context.from;
+
         if (text === "") {
-            callback(null);
+            context.callback(null);
             return;
         }
 
-        if (cancellation.isCancelled) {
-            cancellation.onCancel();
+        if (context.cancellation.isCancelled) {
+            context.cancellation.onCancel();
             // again, not calling the callback effectively stops
             // the animation.
             return;
         }
 
-        element.appendChild(createCharacterElement(text[0]));
+        context.to.appendChild(createCharacterElement(text[0]));
 
-        let interval = mapCharToInterval(config, typeNode, text[0], text.length === 1);
+        let interval = mapCharToInterval(context.config, typeNode, text[0], text.length === 1);
 
         let finish = function ():void {
-            writeText(cancellation, config, text.slice(1), typeNode, element, callback);
-            scrollDown(config);
+            writeText(context, text.slice(1));
+            scrollDown(context.config);
         };
 
         if (interval === 0) {
@@ -422,32 +419,25 @@
     };
 
     let processTypeNode = function (context:AnimationContext):void {
-            if (context.from.childNodes.length >= 1) {
-                let appendedRoot = append(context.config, context.to, context.fromAsElement);
+        if (context.from.childNodes.length >= 1) {
+            let appendedRoot = append(context.config, context.to, context.fromAsElement);
 
-                executeCallbackChain<Node, Node>(
-                    context.from.childNodes,
-                    function (node:Node, callback:IVoidCallback):void {
-                        processTypeNode(context.withTo(appendedRoot).withFrom(node).withCallback(callback).withExtra(context.extra || context.from));
-                    },
-                    context.callback,
-                    null
-                );
+            executeCallbackChain<Node, Node>(
+                context.from.childNodes,
+                function (node:Node, callback:IVoidCallback):void {
+                    processTypeNode(context.withTo(appendedRoot).withFrom(node).withCallback(callback).withExtra(context.extra || context.from));
+                },
+                context.callback,
+                null
+            );
+        } else {
+            if (context.from.nodeType === NodeType.Text) {
+                writeText(context, stripWhitespace(context.fromAsCharacterData.data));
             } else {
-                if (context.from.nodeType === NodeType.Text) {
-                    writeText(
-                        context.cancellation,
-                        context.config,
-                        stripWhitespace((<CharacterData> context.from).data),
-                        context.extra || context.from,
-                        context.to,
-                        context.callback);
-                } else {
-                    context.callback(null);
-                }
+                context.callback(null);
             }
         }
-        ;
+    };
 
     let processors:{[key:string]:IProcessor} = {
         "type": makeProcessor(processTypeNode),

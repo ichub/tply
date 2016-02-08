@@ -150,6 +150,12 @@
             return this._config;
         }
 
+        /**
+         * This is the node which we are currently cloning and animating
+         * into the destination. It is located somewhere within the template
+         * element.
+         * @returns {Node}
+         */
         get from():Node {
             return this._from;
         }
@@ -162,6 +168,11 @@
             return <CharacterData> this._from;
         }
 
+        /**
+         * This is the element INTO which we are cloning and animating
+         * an element.
+         * @returns {HTMLElement}
+         */
         get to():HTMLElement {
             return this._to;
         }

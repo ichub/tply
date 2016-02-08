@@ -442,12 +442,19 @@ import {parse} from "querystring";
     };
 
     const processRepeatNode = function (context:AnimationContext):void {
-        const repeats = parseInt(context.fromAsElement.getAttribute("data-repeat") || "1", 10);
+        const repeatAttr = context.fromAsElement.getAttribute("data-repeat");
+        let repeats = 1;
+
+        if (repeatAttr == "infinite") {
+            repeats = -1;
+        } else if (typeof repeatAttr != "undefined") {
+            repeats = parseInt(repeatAttr, 10);
+        }
 
         let index = 0;
 
         const processAgain = function() {
-            if (index++ < repeats) {
+            if (index++ < repeats || repeats === -1) {
                 processDefaultNode(context.withCallback(processAgain))
             } else {
                 context.callback(null);

@@ -160,6 +160,10 @@
             return this._from;
         }
 
+        get fromAsElement():HTMLElement {
+            return <HTMLElement> this._from;
+        }
+
         get to():HTMLElement {
             return this._to;
         }
@@ -341,11 +345,11 @@
                                     node:HTMLElement,
                                     root:HTMLElement,
                                     callback:IProcessorCallback):void {
-        let duration = parseDuration(node.innerText);
+        let duration = parseDuration(context.fromAsElement.innerText);
 
         setTimeout(
             function ():void {
-                callback(null);
+                context.callback(null);
             },
             duration);
     };
@@ -444,25 +448,25 @@
         topLevelTypeNode = topLevelTypeNode || <HTMLElement> node;
 
         if (node.childNodes.length >= 1) {
-            let appendedRoot = append(config, root, <HTMLElement> node);
+            let appendedRoot = append(config, context.to, context.fromAsElement);
 
             executeCallbackChain<Node, Node>(
-                node.childNodes,
+                context.from.childNodes,
                 function (node:Node, callback:IVoidCallback):void {
-                    processTypeNode(context.withTo(appendedRoot).withCallback(callback).withExtra(topLevelTypeNode), cancellation, config, node, appendedRoot, callback, topLevelTypeNode);
+                    processTypeNode(context.withTo(appendedRoot).withFrom(node).withCallback(callback).withExtra(topLevelTypeNode), cancellation, config, node, appendedRoot, callback, topLevelTypeNode);
                 },
-                callback,
+                context.callback,
                 null
             );
         } else {
-            if (node.nodeType === NodeType.Text) {
+            if (context.from.nodeType === NodeType.Text) {
                 writeText(
-                    cancellation,
-                    config,
-                    stripWhitespace((<CharacterData> node).data),
-                    topLevelTypeNode,
-                    root,
-                    callback);
+                    context.cancellation,
+                    context.config,
+                    stripWhitespace((<CharacterData> context.from).data),
+                    context.extra,
+                    context.to,
+                    context.callback);
             } else {
                 callback(null);
             }
@@ -480,12 +484,12 @@
                                 node:Node,
                                 root:HTMLElement,
                                 callback:IProcessorCallback):void {
-        if (node.nodeType === NodeType.Element) {
-            let tag = (<HTMLElement>node).tagName.toLowerCase();
+        if (context.from.nodeType === NodeType.Element) {
+            let tag = (<HTMLElement>context.from).tagName.toLowerCase();
             let matchingProcessor = processors[tag] || processDefaultNode;
             matchingProcessor(context, cancellation, config, node, root, callback);
         } else if (node.nodeType === NodeType.Text) {
-            root.appendChild(document.createTextNode((<CharacterData> node).data));
+            root.appendChild(document.createTextNode((<CharacterData> context.from).data));
             scrollDown(config);
             callback(null);
         } else {
@@ -502,14 +506,14 @@
                                  root:HTMLElement,
                                  callback:IProcessorCallback):void {
         executeCallbackChain<Node, Node>(
-            nodes,
+            context.from.childNodes,
             function (node:Node, callback:IVoidCallback):void {
                 const clone = node.cloneNode(true);
 
                 processNode(context.withFrom(<HTMLElement> clone).withCallback(callback), cancellation, config, clone, root, callback);
             },
-            callback,
-            root
+            context.callback,
+            context.to
         );
     };
 

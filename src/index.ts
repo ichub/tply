@@ -194,15 +194,15 @@
                                               defaultCallbackParam:U):void {
         let index = 0;
 
-        const process = function ():void {
+        const processNextItem = function ():void {
             if (index < items.length) {
-                processFn(items[index++], process);
+                processFn(items[index++], processNextItem);
             } else {
                 callback(defaultCallbackParam);
             }
         };
 
-        process();
+        processNextItem();
     };
 
     let stripWhitespace = function (text:string):string {
@@ -219,7 +219,7 @@
      * call or don't - up to you.
      * @returns - Function with the same signature as the original one.
      */
-    let makeProxy = function<T> (original:T, wrapper:Function):T {
+    let wrapFunction = function<T> (original:T, wrapper:Function):T {
         return <T> <any> function ():void {
             const argsArray = Array.prototype.slice.call(arguments);
             argsArray.push(original);
@@ -274,7 +274,7 @@
                         }
 
                         if (typeof context.config.processing[k].post === "function") {
-                            callBackProxy = makeProxy<IProcessorCallback>(
+                            callBackProxy = wrapFunction<IProcessorCallback>(
                                 callBackProxy,
                                 function (element:HTMLElement, originalCallback:IProcessorCallback):void {
                                     context.config.processing[k].post(element);
@@ -299,11 +299,10 @@
      * @param desiredTag - The desired tag that the clone should be (ie. 'div', 'a', 'span', etc.)
      * @param justCopyIt - If true, copy the children too, if false do not copy the children.
      */
-    const append = function (config:IConfiguration,
-                           root:HTMLElement,
-                           node:HTMLElement,
-                           desiredTag:string = null,
-                           justCopyIt:boolean = false):HTMLElement {
+    const append = function (root:HTMLElement,
+                             node:HTMLElement,
+                             desiredTag:string = null,
+                             justCopyIt:boolean = false):HTMLElement {
         let clone = <HTMLElement> node.cloneNode(true);
 
         if (!justCopyIt) {
@@ -415,7 +414,7 @@
     const processTypeNode = function (context:AnimationContext):void {
         switch (context.from.nodeType) {
             case NodeType.Element:
-                const appendedRoot = append(context.config, context.to, context.fromAsElement);
+                const appendedRoot = append(context.to, context.fromAsElement);
 
                 executeCallbackChain<Node, Node>(
                     context.from.childNodes,
@@ -475,7 +474,7 @@
 
     const processDefaultNode = makeProcessor(function (context:AnimationContext):void {
         const noAnimateContents = context.fromAsElement.getAttribute("data-ignore-tply") === "true";
-        const clone = append(context.config, context.to, context.fromAsElement, null, noAnimateContents);
+        const clone = append(context.to, context.fromAsElement, null, noAnimateContents);
         clone.classList.add("fadein");
 
         if (noAnimateContents) {

@@ -1,4 +1,3 @@
-import {parse} from "querystring";
 (function ():void {
     const parseDuration:IParseDuration = require("parse-duration");
 

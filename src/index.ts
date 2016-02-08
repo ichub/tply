@@ -496,10 +496,7 @@
                                conf:IConfiguration = {},
                                callback:() => void = () => null):Cancellation {
                 let cancellation = new Cancellation();
-                let context = new AnimationContext(cancellation, conf, from, to, callback);
-
-                runAnimation(context);
-
+                runAnimation(new AnimationContext(cancellation, conf, from, to, callback));
                 return cancellation;
             }
         };

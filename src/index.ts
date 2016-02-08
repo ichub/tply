@@ -23,6 +23,7 @@
             pre: (element:HTMLElement) => void,
             post: (element:HTMLElement) => void
         }];
+        shouldScrollDown?:boolean;
     }
 
     interface IElementProcessorCallback extends Function {
@@ -100,7 +101,7 @@
             return clone;
         }
 
-        public withTo(node:HTMLElement) {
+        public withTo(node:HTMLElement):AnimationContext {
             const clone = this.clone();
             clone._to = node;
             return clone;
@@ -233,7 +234,9 @@
                             }
 
                             context.fromAsElement.classList.add(context.config.types[j].styleClasses || "");
-                            context.fromAsElement.setAttribute("style", context.fromAsElement.getAttribute("style") + ";" + context.config.types[j].style);
+                            context.fromAsElement.setAttribute(
+                                "style",
+                                context.fromAsElement.getAttribute("style") + ";" + context.config.types[j].style);
                         }
                     }
                 }
@@ -299,8 +302,9 @@
     };
 
     const scrollDown = function (config:IConfiguration):void {
-        return;
-        window.scroll(0, document.documentElement.offsetHeight);
+        if (config.shouldScrollDown) {
+            window.scroll(0, document.documentElement.offsetHeight);
+        }
     };
 
     const mapFirstCharToInterval = function (context:AnimationContext, text:string):number {
@@ -320,7 +324,7 @@
 
         const char = text[0];
 
-        if (text.length == 1) {
+        if (text.length === 1) {
             return endInterval;
         } else if (char === "." || char === "?" || char === "!") {
             return Math.max(charInterval, periodInterval);

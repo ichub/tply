@@ -69,20 +69,26 @@
     class AnimationContext {
         private _cancellation:Cancellation;
         private _config:IConfiguration;
+        private _rootFrom:Node;
         private _from:Node;
+        private _rootTo:HTMLElement;
         private _to:HTMLElement;
         private _callback:IElementProcessorCallback;
         private _extra:any;
 
         constructor(cancellation:Cancellation,
                     config:IConfiguration,
-                    currentNode:Node,
-                    currentRoot:HTMLElement,
+                    rootFrom:Node,
+                    from:Node,
+                    rootTo:HTMLElement,
+                    to:HTMLElement,
                     callback:IElementProcessorCallback) {
             this._cancellation = cancellation;
             this._config = config;
-            this._from = currentNode;
-            this._to = currentRoot;
+            this._rootFrom = rootFrom;
+            this._from = from;
+            this._rootTo = rootTo;
+            this._to = to;
             this._callback = callback;
         }
 
@@ -90,7 +96,9 @@
             return new AnimationContext(
                 this._cancellation,
                 this._config,
+                this._rootFrom,
                 this._from,
+                this._rootTo,
                 this._to,
                 this._callback);
         }
@@ -161,11 +169,19 @@
         get extra():any {
             return this._extra;
         }
+
+        get rootFrom():Node {
+            return this._rootFrom;
+        }
+
+        get rootTo():HTMLElement {
+            return this._rootTo;
+        }
     }
 
-    let asynchronouslyProcessNodes = function (context:AnimationContext,
-                                               processFn:(item:Node, callback:() => void) => void,
-                                               callbackParam:Node = null):void {
+    const asynchronouslyProcessNodes = function (context:AnimationContext,
+                                                 processFn:(item:Node, callback:() => void) => void,
+                                                 callbackParam:Node = null):void {
         let index = 0;
 
         const processNextItem = function ():void {
@@ -179,8 +195,12 @@
         processNextItem();
     };
 
-    let stripWhitespace = function (text:string):string {
+    const stripWhitespace = function (text:string):string {
         return text.replace(/\n/, "").replace(/\s\s+/g, " ");
+    };
+
+    const removeChildren = function (element:HTMLElement) {
+        element.innerHTML = "";
     };
 
     /**
@@ -410,18 +430,21 @@
             duration);
     };
 
-    const processClearNode = function (context:AnimationContext):void {
-        for (let i = 0; i < context.to.childNodes.length; i++) {
-            context.to.removeChild(context.to.childNodes[i]);
-        }
+    const processClearParentNode = function (context:AnimationContext):void {
+        removeChildren(context.to);
+        context.callback(null);
+    };
 
+    const processClearAllNode = function (context:AnimationContext):void {
+        removeChildren(context.rootTo);
         context.callback(null);
     };
 
     const processors:{[key:string]:IElementProcessor} = {
         "type": makeProcessor(processTypeNode),
         "wait": makeProcessor(processWaitNode),
-        "clear": makeProcessor(processClearNode)
+        "clear_parent": makeProcessor(processClearParentNode),
+        "clear_all": makeProcessor(processClearAllNode)
     };
 
     const processDefaultNode = makeProcessor(function (context:AnimationContext):void {
@@ -473,7 +496,7 @@
                                conf:IConfiguration = {},
                                callback:() => void = () => null):Cancellation {
                 const cancellation = new Cancellation();
-                runAnimation(new AnimationContext(cancellation, conf, from, to, callback));
+                runAnimation(new AnimationContext(cancellation, conf, from, from, to, to, callback));
                 return cancellation;
             }
         };

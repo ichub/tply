@@ -51,17 +51,6 @@
     }
 
     /**
-     * This is necessary because the {@link NodeList} object prototype et. al. are severely
-     * crippled versions of JavaScript arrays, and don't support simple things like `forEach`,
-     * `map`, `filter`, etc. If we just want to be able to get the length of these shady types,
-     * and index on them, this interface provides a generic way of doing that.
-     */
-    interface ISimpleArray<T> {
-        length: number;
-        [index: number]: T;
-    }
-
-    /**
      * This class is in charge of keeping track of the cancellation state of a given
      * animation. Since some animations can be super long, there may arise a need to cancel
      * one at some time or another.

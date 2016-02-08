@@ -25,24 +25,11 @@
         }];
     }
 
-    /**
-     * When a processor finishes processing its given element and that element's children,
-     * it yields control back to its parent by calling this function. The `element` parameter
-     * is a reference to the element which the processor inserted into the DOM.
-     */
-    interface IProcessorCallback extends Function {
-        (element:HTMLElement | Node | void): void;
+    interface IElementProcessorCallback extends Function {
+        (element:Node | void): void;
     }
 
-    /**
-     * Processors are in charge of animating a given element or node. They should respond to
-     * cancellation requests (most of the time this works by default, since it is injected
-     * into the processor using the {@link makeProcessor} function). They should yield control
-     * back to the caller once animation is completed using the `callback` function. There is a
-     * `...params:any[]` parameter because some processors may be recursive, and pass extra
-     * parameters to themselves on subsequent runs.
-     */
-    interface IProcessor {
+    interface IElementProcessor {
         (context:AnimationContext): void;
     }
 
@@ -83,14 +70,14 @@
         private _config:IConfiguration;
         private _from:Node;
         private _to:HTMLElement;
-        private _callback:IProcessorCallback;
+        private _callback:IElementProcessorCallback;
         private _extra:any;
 
         constructor(cancellation:Cancellation,
                     config:IConfiguration,
                     currentNode:Node,
                     currentRoot:HTMLElement,
-                    callback:IProcessorCallback) {
+                    callback:IElementProcessorCallback) {
             this._cancellation = cancellation;
             this._config = config;
             this._from = currentNode;
@@ -119,7 +106,7 @@
             return clone;
         }
 
-        public withCallback(callback:IProcessorCallback):AnimationContext {
+        public withCallback(callback:IElementProcessorCallback):AnimationContext {
             const clone = this.clone();
             clone._callback = callback;
             return clone;
@@ -166,7 +153,7 @@
             return this._to;
         }
 
-        get callback():IProcessorCallback {
+        get callback():IElementProcessorCallback {
             return this._callback;
         }
 
@@ -220,7 +207,7 @@
      * by the configuration. Additionally, stops the animation if it is cancelled.
      * @param processFn
      */
-    let makeProcessor = function (processFn:IProcessor):IProcessor {
+    let makeProcessor = function (processFn:IElementProcessor):IElementProcessor {
         return function (context:AnimationContext):void {
             if (context.cancellation.isCancelled) {
                 context.cancellation.onCancel();
@@ -260,9 +247,9 @@
                         }
 
                         if (typeof context.config.processing[k].post === "function") {
-                            callBackProxy = wrapFunction<IProcessorCallback>(
+                            callBackProxy = wrapFunction<IElementProcessorCallback>(
                                 callBackProxy,
-                                function (element:HTMLElement, originalCallback:IProcessorCallback):void {
+                                function (element:HTMLElement, originalCallback:IElementProcessorCallback):void {
                                     context.config.processing[k].post(element);
                                     originalCallback(element);
                                 });
@@ -279,19 +266,18 @@
     /**
      * Appends a clone of an HTML Element to another one, conditionally removing
      * all of its children.
-     * @param config - Configuration for options.
      * @param root - The element to which the clone will be appended.
      * @param node - The element to clone and append.
      * @param desiredTag - The desired tag that the clone should be (ie. 'div', 'a', 'span', etc.)
-     * @param justCopyIt - If true, copy the children too, if false do not copy the children.
+     * @param deepCopy - If true, copy the children too, if false do not copy the children.
      */
     const append = function (root:HTMLElement,
                              node:HTMLElement,
                              desiredTag:string = null,
-                             justCopyIt:boolean = false):HTMLElement {
+                             deepCopy:boolean = false):HTMLElement {
         let clone = <HTMLElement> node.cloneNode(true);
 
-        if (!justCopyIt) {
+        if (!deepCopy) {
             clone.innerHTML = "";
         }
 
@@ -421,7 +407,7 @@
         }
     };
 
-    const processors:{[key:string]:IProcessor} = {
+    const processors:{[key:string]:IElementProcessor} = {
         "type": makeProcessor(processTypeNode),
         "wait": makeProcessor(processWaitNode)
     };

@@ -1,3 +1,4 @@
+import {parse} from "querystring";
 (function ():void {
     const parseDuration:IParseDuration = require("parse-duration");
 
@@ -440,11 +441,28 @@
         context.callback(null);
     };
 
+    const processRepeatNode = function (context:AnimationContext):void {
+        const repeats = parseInt(context.fromAsElement.getAttribute("data-repeat") || "1", 10);
+
+        let index = 0;
+
+        const processAgain = function() {
+            if (index++ < repeats) {
+                processDefaultNode(context.withCallback(processAgain))
+            } else {
+                context.callback(null);
+            }
+        };
+
+        processAgain();
+    };
+
     const processors:{[key:string]:IElementProcessor} = {
         "type": makeProcessor(processTypeNode),
         "wait": makeProcessor(processWaitNode),
         "clear_parent": makeProcessor(processClearParentNode),
-        "clear_all": makeProcessor(processClearAllNode)
+        "clear_all": makeProcessor(processClearAllNode),
+        "repeat": makeProcessor(processRepeatNode)
     };
 
     const processDefaultNode = makeProcessor(function (context:AnimationContext):void {

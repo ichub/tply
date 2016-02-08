@@ -345,6 +345,7 @@
 
     const createCharacterElement = function (char:string):Node {
         const charElement = document.createElement("span");
+
         charElement.classList.add("character");
         charElement.innerText = char;
 
@@ -362,8 +363,6 @@
 
         if (context.cancellation.isCancelled) {
             context.cancellation.onCancel();
-            // again, not calling the callback effectively stops
-            // the animation.
             return;
         }
 
@@ -371,15 +370,15 @@
 
         const interval = mapFirstCharToInterval(context, text);
 
-        const finish = function ():void {
+        const continueWriting = function ():void {
             writeText(context, text.slice(1));
             scrollDown(context.config);
         };
 
         if (interval === 0) {
-            finish();
+            continueWriting();
         } else {
-            setTimeout(finish, interval);
+            setTimeout(continueWriting, interval);
         }
     };
 

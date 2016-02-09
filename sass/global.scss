@@ -15,14 +15,6 @@ body {
   line-height: 1.5em;
 }
 
-#template {
-  display: initial;
-}
-
-#animation {
-  margin-top: 20px;
-}
-
 .title {
   font-size: 4em;
   margin-top: 25px;
@@ -39,9 +31,6 @@ body {
   margin-right: auto;
   margin-top: 100px;
   padding-bottom: 300px;
-}
-
-p {
 }
 
 .character {
@@ -68,148 +57,21 @@ p {
   animation-duration: 300ms;
 }
 
-code {
-  padding: 10px !important;
-  border-radius: 2px;
-  overflow: hidden;
-  font-family: $font-monospace;
+#google-video {
+  width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
 }
 
-.gallery {
-  min-height: 100px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  flex-direction: row;
-
-  $margin: 20px;
-  padding-top: $margin;
-
-  .section {
-    overflow: hidden;
-    position: relative;
-    background-color: #80d889;
-    min-height: 250px;
-    min-width: 350px;
-    width: 40%;
-    border-radius: 2px;
-
-    margin-bottom: $margin;
-    margin-left: $margin / 2;
-    margin-right: $margin / 2;
-
-    img {
-      width: 100px;
-    }
-
-    .tply-container {
-      z-index: 1;
-      position: absolute;
-
-      .tply-template {
-        display: none;
-      }
-      .tply-animation {
-        padding: 40px;
-      }
-    }
-
-    .cover {
-      z-index: 2;
-      position: absolute;
-      background-color: rgb(223, 223, 223);
-      width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: opacity 200ms;
-
-      .description {
-        font-weight: bold;
-      }
-
-      &.hidden {
-        opacity: 0;
-        visibility: hidden;
-      }
-
-      &:hover {
-        background-color: rgb(197, 197, 197);
-        cursor: pointer;
-
-        .description {
-          text-decoration: underline
-        }
-      }
-    }
-  }
+p {
+  text-indent: 3em;
 }
 
-.robot {
-  font-family: $font-monospace;
+#source {
+  display: none;
 }
 
-$button-color: #c44fac;
-
-button {
-  padding: 5px 15px 5px 15px;
-  border: none;
-  border-radius: 2px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-  background-color: $button-color;
-  color: white;
-  outline: none;
-  transition: 200ms;
-  cursor: pointer;
-  font-size: inherit;
-
-  &:hover {
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
-    background-color: lighten($button-color, 5);
-  }
-
-  &:active {
-    background-color: lighten($button-color, 10);
-  }
-}
-
-@keyframes wobble {
-  0% {
-    transform: rotate(-10deg);
-  }
-
-  50% {
-    transform: rotate(10deg)
-  }
-
-  100% {
-    transform: rotate(-10deg);
-  }
-}
-
-#big-duck-container {
-  z-index: 1000;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  &.hidden {
-    display: none;
-  }
-
-  #big-duck {
-    border-radius: 2px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-    animation-name: wobble;
-    animation-duration: 50ms;
-    animation-iteration-count: infinite;
-  }
+#destination {
+  
 }

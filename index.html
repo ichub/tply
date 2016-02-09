@@ -12,6 +12,29 @@
     <link rel="stylesheet" href="/css/global.css">
 </head>
 <body>
+<div class="container">
+    <h1>tply</h1>
+    <video id="google-video" src="/static/output.webm" autoplay loop></video>
+    <p>
+        Have you ever seen the effect like the one in the above video? It's front and center on the about page of
+        Google Docs, and I think it conveys the usefulness of the product very effectively. I really like the typing
+        effect.
+    </p>
+    <p>
+        So, I decided to make my own little version of something like that, but in a way that makes it possible to
+        user in a very simple and repeatable way.
+    </p>
+    <div>
+        <div id="source">
+            animation
+        </div>
+        <div id="destination">
 
+        </div>
+    </div>
+    <script>
+        tply.animate(document.getElementById("source"), document.getElementById("destination"))
+    </script>
+</div>
 </body>
 </html>

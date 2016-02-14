@@ -199,7 +199,7 @@
         return text.replace(/\n/, "").replace(/\s\s+/g, " ");
     };
 
-    const removeChildren = function (element:HTMLElement) {
+    const removeChildren = function (element:HTMLElement):void {
         element.innerHTML = "";
     };
 
@@ -444,9 +444,9 @@
         const repeatAttr = context.fromAsElement.getAttribute("data-repeat");
         let repeats = 1;
 
-        if (repeatAttr == "infinite") {
+        if (repeatAttr === "infinite") {
             repeats = -1;
-        } else if (typeof repeatAttr != "undefined") {
+        } else if (typeof repeatAttr !== "undefined") {
             repeats = parseInt(repeatAttr, 10);
         }
 
@@ -454,12 +454,12 @@
 
         const clone = append(context.to, context.fromAsElement);
 
-        const processAgain = function () {
+        const processAgain = function ():void {
             if (index++ < repeats || repeats === -1) {
                 asynchronouslyProcessNodes(
                     context.withCallback(processAgain),
-                    function (node:Node, callback:IVoidCallback) {
-                        processNode(context.withFrom(node).withCallback(callback).withTo(clone))
+                    function (node:Node, callback:IVoidCallback):void {
+                        processNode(context.withFrom(node).withCallback(callback).withTo(clone));
                     });
             } else {
                 context.callback(null);

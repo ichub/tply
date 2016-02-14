@@ -72,6 +72,43 @@ p {
   display: none;
 }
 
-#destination {
-  
+.style {
+  background-color: rgb(75, 82, 169);
+  color: white;
+  padding: 3px 10px 3px 10px;
+  font-size: 40px;
+  font-family: $font-monospace;
+  line-height: 50px;
+}
+
+$chars: 100;
+
+@function contrast($component) {
+  @if $component < 255 / 2 {
+    @return $component + 255 / 2;
+  }
+
+  @return $component - 255 / 2;
+}
+
+.message {
+  font-size: 50px;
+  line-height: 80px;
+  font-weight: bold;
+  font-style: italic;
+
+  .character {
+    letter-spacing: 15px;
+  }
+
+  @for $i from 0 through $chars {
+    .character:nth-child(#{$i}) {
+      $r: 255 / $chars * random($chars);
+      $g: 255 / $chars * random($chars);
+      $b: 255 / $chars * random($chars);
+
+      color: rgb($r, $g, $b);
+      background-color: rgb(contrast($r), contrast($g), contrast($b));
+    }
+  }
 }

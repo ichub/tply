@@ -1,84 +1,66 @@
 # tply
 
-This project allows you to simulate character-by-character typing within a webpage.
-
-## usage
-
-Put a reference to the tply source file at the top of your html:
-```html
-<script src="tply.js"></script>
-```
-Then, in your html, have two elements - a source, and a destination. tply will read the elements from the source,
-and write them in sequentially into the destination. Then, call the tply script to animate.
+This library allows you to simulate text being typed out character by character. Heres a "hello world" example:
 
 ```html
-<div id="template">
-    this is the source
-</div>
-
-<div id="animation">
-this is the destination
-</div>
-
-<script>
-    tply.animate(
-        document.getElementById("template"), 
-        document.getElementById("animation"));
-</script>
-```
-
-If you so choose, you can pass in a configuration object to the `animate` function, which will change the behavior
-of the animation. For example:]
-
-```html
-<script>
-    tply.animate(
-        document.getElementById("template"),
-        document.getElementById("animation"),
-        {
-            processing: [
-                {
-                    tag: "code",
-                    post: function(element) {
-                        hljs.highlightBlock(element);
-                    }
-                }
-            ]
-        });
-</script>
-```
-### config options
-#### `processing`
-If you want to process elements before or after they are inserted into the destination, use this. Each item in the `processing` array can have the following properties:
-
-* `tag` **(required)** the tag of elements to process. If you want to process all `div`s, set `tag` to be `"div"`
-* `pre` **(optional)** a function which takes one parameter - an html element - and does whatever you want with it
-* `post`**(optional)** just like `pre`, but processes the element after it's been inserted into the DOM
-
-Example config object with explanation:
-
-```javascript
-{
-    processing: [
-        {
-            tag: "h1",
-            pre: function(element) {
-                element.innerText += "Robert'); DROP TABLE Students;--" 
-            },
-            post: function(element) {
-                element.parentNode.style.background = "red";
+<html>
+    <head>
+        <script src="the_path_to_tply.js"></script>
+        <style>
+            #source {
+                display: none;
             }
-        }
-    ]
-}
+        </style>
+    </head>
+    <body>
+        <div id="source">
+            <type>this text is typed out!</type>
+        </div>
+        <div id="destination">
+        </div>
+        
+        <script>
+            tply.animate(
+                document.getElementById("source"),
+                document.getElementById("destination"));
+        </script>
+    </body>
+</html>
 ```
 
-Given this config object, tmly will append the string `"Robert'); DROP TABLE Students;--"` inside all `<h1></h1>` elements within the animation. Additionally, it will set the background of the parent of each `h1` to be red. Note that the second change would not work during pre-processing, because at that point the element would not be inserted into the DOM yet, and thus not have a parent node.
+## Documentation
 
-#### `types`
-If you find yourself typing out `data-char-interval` and co. too often, perhaps you could use types. Types allow you to pre-define these attributes, and reuse common 'types'. Each object in the `types` array can have the following properties:
+tply renders the markup within the source element into the destination element. tply renders each element one by one,
+in the order that they appear in the source element. In addition to being able to use any existing html element, you
+can also use one of these:
 
-* `name` **(required)** the name of the type
-* `properties` **(required)** key-value of all the attributes you want the elements with this type to have
-* `styleClasses` **(optional)** a string with css classes which all elements with this type should have
-* `style` **(optional)** raw css which the `style` attribute of elements with this type should have.
+### `wait`
+This element pauses the animation for a specified amount of time. Times can be specified in the format specified by the
+`parse-duration` npm module, which can be found [here](https://www.npmjs.com/package/parse-duration). Here are some
+example durations taken from that page:
+```text
+1ns  => 1 / 1e6 
+1μs  => 1 / 1000 
+1ms  => 1 
+1s   => ms * 1000 
+1m   => s * 60 
+1h   => m * 60 
+1d   => h * 24 
+1w   => d * 7 
+1y   => d * 365.25 
+```
+
+Here's an example of a wait element which would pause the animation for 100 milliseconds.
+```html
+<wait>100ms</wait>
+```
+
+### `type`
+Text within this element is typed out character by character. Each character is a `span` with the `.character` class
+applied to it. You can define the style of `.character` as you wish. For example, you could add an animation to fade
+each character in, etc.
+
+##### example
+```html
+<type>this text will be typed out</type>
+```

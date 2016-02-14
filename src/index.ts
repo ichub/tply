@@ -452,9 +452,15 @@
 
         let index = 0;
 
-        const processAgain = function() {
+        const clone = append(context.to, context.fromAsElement);
+
+        const processAgain = function () {
             if (index++ < repeats || repeats === -1) {
-                processDefaultNode(context.withCallback(processAgain))
+                asynchronouslyProcessNodes(
+                    context.withCallback(processAgain),
+                    function (node:Node, callback:IVoidCallback) {
+                        processNode(context.withFrom(node).withCallback(callback).withTo(clone))
+                    });
             } else {
                 context.callback(null);
             }

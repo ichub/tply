@@ -47,7 +47,11 @@
         private _isCancelled:boolean = false;
         private cancellationListeners:Array<() => void> = [];
 
-        public cancel():void {
+        public cancel(callback?:IVoidCallback):void {
+            if (typeof callback !== "undefined") {
+                this.registerCancellationListener(callback);
+            }
+
             this._isCancelled = true;
         }
 

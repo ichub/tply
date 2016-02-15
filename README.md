@@ -63,28 +63,63 @@ setTimeout(
 In addition to pasing in the source and destination of the animation, you can pass in a 3rd, optional, argument,
 with more configuration.
 
+The configuration object follows this schema:
+* `configuration` - an object with:
+    * `types` - an array of:
+        * `name` - a string with whatever you want the name of the type to be
+        * `properties` - an object with:
+            * key-value of attribute names and values
+        * `styleClasses` - a string of whitespace-separated css class names to add to all elements with this type
+        * `style` - a css string to put in the `style` attribute of all elements with this type
+    * `processing` - an array of:
+        * `tag` - a string with the tag name to match (eg. `div`)
+        * `pre` - a function that takes one parameter - an HTML Element - which tply will apply to all matching
+        elements before they are inserted into the destination
+        * `post` - same as `pre`, but applied after the element is inserted into the destination
+        
+#### Configuration Example
+Here is an example `animate` invocation with a configuration object.
 ```javascript
 tply.animate(
     document.getElementById("source"),
     document.getElementById("destination"),
     {
         types: [
-            name: "",
+            name: "robot-type",
             properties: {
-                "data-prop1": "value1",
-                "data-prop2": "value2"
+                "data-char-interval": "0ms",
+                "data-comma-interval": "0ms",
+                "data-period-interval": "0ms",
+                "data-word-interval": "100ms"
             },
-            styleClasses: "",
-            style: ""
+            styleClasses: "robot-type",
+            style: "font-family: monospace;"
         ],
         processing: [
             tag: "div",
             pre: function(element) {
+                element.innerText += " haha"
             },
             post: function(element) {
+                element.parentElement.style.backgroundColor = "red";
             }
         ]
     });
+```
+
+And here is the corresponding HTML:
+```html
+<div id="source">
+    <type data-type="robot-type">
+        this text will be typed out word-by-word rather than character-by-character!
+    </type>
+    <div>
+        <!-- after this div is inserted, its parent will 
+             be made to have a red background color -->
+    </div>
+</div>
+<div id="destination">
+</div>
 ```
 
 ## Documentation - HTML

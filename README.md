@@ -204,3 +204,37 @@ Removes all children of the root animation source.
     </div>
 </div>
 ```
+
+## Contributing
+
+### Development
+Before you can start developing, install `gulp` and `tsd` globally, and then install the project's dependencies:
+
+```bash
+cd path/to/tply
+sudo npm install -g gulp tsd
+npm install
+tsd install
+```
+
+These are the tasks in the gulpfile which you can use for development
+
+##### `gulp sass [-p]`
+Builds the style for the demo page. If the production flag is specified, minfies the output.
+
+##### `gulp ts [-p]`
+Builds the TypeScript into JavaScript. Converts the javascript from ES2015 into the current standard Javascript. Bundles up npm dependencies. If the production flag is specified, minfies the output as well.
+
+##### `gulp watch [-p]`
+Builds the TypeScript and Sass, watches for changes and recompiles when a change is detected.
+
+##### `gulp serve [-p]`
+Serves `index.html` using a livereload server, and watches source files for changes.
+
+##### `gulp lint`
+Lints the TypeScript.
+
+#### Contribution Guidelines
+
+* Don't introduce linting or TypeScript compilation errors.
+* If you change the behavior or something, make sure it reflects in the readme.

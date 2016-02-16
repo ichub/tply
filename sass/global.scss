@@ -91,24 +91,27 @@ $chars: 100;
   @return $component - 255 / 2;
 }
 
-.message {
-  font-size: 50px;
-  line-height: 80px;
-  font-weight: bold;
-  font-style: italic;
+.example-container {
+  background-color: darken($back-color, 10);
+  display: inline-block;
+  width: 500px;
+  height: 250px;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
 
-  .character {
-    letter-spacing: 15px;
+  .example {
+    padding: 25px;
+    font-size: 15px;
   }
 
-  @for $i from 0 through $chars {
-    .character:nth-child(#{$i}) {
-      $r: 255 / $chars * random($chars);
-      $g: 255 / $chars * random($chars);
-      $b: 255 / $chars * random($chars);
-
-      color: rgb($r, $g, $b);
-      background-color: rgb(contrast($r), contrast($g), contrast($b));
-    }
+  .code {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
   }
+}
+
+pre {
+  margin: 0;
 }

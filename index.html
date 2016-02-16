@@ -13,56 +13,13 @@
 <body>
 <div class="container">
     <h1>tply demo</h1>
-    <div id="source">
-        <type>hello.</type>
-        <wait>500ms</wait>
-        <br>
-        <type>how's it going?</type>
-        <wait>1s</wait>
-        <br>
-        <type>check out what I can do!</type>
-        <wait>1s</wait>
-        <br>
-        <type data-char-interval="10ms">I can type really really really fast!</type>
-        <wait>500ms</wait>
-        <br>
-        <type>or I can type super</type>
-        <type data-char-interval="300ms">slow</type>
-        <wait>1s</wait>
-        <br>
-        <type>
-            I can type with <span class="style">style</span> too
-        </type>
-        <wait>500ms</wait>
-        <br>
-        <repeat data-repeat="5">
-            <type data-char-interval="10ms">I can repeat stuff five times (or any amount)</type>
-            <wait>300ms</wait>
-            <br>
-        </repeat>
-        <wait>200ms</wait>
-        <type>I can remove everything that's been typed so far</type>
-        <br>
-        <type data-period-interval="500ms">.....</type>
-        <clear_all></clear_all>
-        <wait>500ms</wait>
-        <type><em>*poof*</em></type>
-        <wait>1s</wait>
-        <br>
-        <type>It's all gone huh. What a shame. Have this infinitely repeating message as consolation:</type>
-        <br>
-        <repeat data-repeat="infinite">
-            <type class="message">tply is super cool</type>
-            <wait>300ms</wait>
-            <clear_parent></clear_parent>
-        </repeat>
-    </div>
-    <div id="destination">
 
+    <div class="example-container">
+        <div class="example">asdf</div>
+        <div class="code">
+            <pre><code class="html">asdf</code></pre>
+        </div>
     </div>
-    <script>
-        tply.animate(document.getElementById('source'), document.getElementById('destination'));
-    </script>
 </div>
 </body>
 </html>

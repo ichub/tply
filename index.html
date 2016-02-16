@@ -15,11 +15,33 @@
     <h1>tply demo</h1>
 
     <div class="example-container">
-        <div class="example">asdf</div>
+        <div class="example">
+            <div class="tply-template">
+                <type>this is an example</type>
+            </div>
+            <div class="tply-destination"></div>
+        </div>
         <div class="code">
             <pre><code class="html">asdf</code></pre>
         </div>
     </div>
+
+    <script>
+        (function() {
+            "use strict";
+
+            let examples = document.querySelectorAll(".example-container");
+
+            for (let i = 0; i < examples.length; i++) {
+                let example = examples[i];
+
+                let template = example.querySelector(".tply-template");
+                let destination = example.querySelector(".tply-destination");
+
+                tply.animate(template, destination);
+            }
+        })();
+    </script>
 </div>
 </body>
 </html>

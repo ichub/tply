@@ -1,6 +1,6 @@
 # tply
 
-This library allows you to simulate text being typed out character by character. Heres a "hello world" example:
+This library allows you to simulate text being typed out character by character. Here's a "hello world" example:
 
 ```html
 <html>

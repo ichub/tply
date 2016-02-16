@@ -18,6 +18,7 @@
         <div class="example">
             <div class="tply-template">
                 <type>this is an example</type>
+                <wait>500ms</wait>
             </div>
             <div class="tply-destination"></div>
         </div>
@@ -27,8 +28,47 @@
     </div>
 
     <script>
-        (function() {
+        (function () {
             "use strict";
+
+            let unindentCode = function (text) {
+                let nonWhitespaceFound = false;
+                let skippingWhitespace = false;
+                let skipCount = 0;
+                let whitespaceCount = 0;
+                let result = "";
+                let lastReturn = text.lastIndexOf("\n");
+
+                for (let i = 0; i < text.length; i++) {
+                    if (!nonWhitespaceFound) {
+                        if (text[i] == " ") {
+                            whitespaceCount++;
+                        } else if (text[i] != "\n") {
+                            result += text[i];
+                            nonWhitespaceFound = true;
+                        }
+                    } else {
+                        if (skippingWhitespace) {
+                            if (++skipCount >= whitespaceCount) {
+                                skippingWhitespace = false;
+                            }
+                        } else {
+                            if (text[i] == "\n") {
+                                if (i == lastReturn) {
+                                    break;
+                                }
+                                
+                                skippingWhitespace = true;
+                                result += text[i];
+                            } else {
+                                result += text[i];
+                            }
+                        }
+                    }
+                }
+
+                return result;
+            };
 
             let examples = document.querySelectorAll(".example-container");
 
@@ -37,6 +77,10 @@
 
                 let template = example.querySelector(".tply-template");
                 let destination = example.querySelector(".tply-destination");
+
+                let code = example.querySelector(".code pre code");
+
+                code.innerText = unindentCode(template.innerHTML);
 
                 tply.animate(template, destination);
             }

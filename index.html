@@ -14,7 +14,7 @@
     <h1>tply demo</h1>
 
     <div class="examples">
-        <div class="example-container">
+        <div class="example-container" data-title="simple text">
             <type>this is an example</type>
             <wait>500ms</wait>
         </div>
@@ -79,6 +79,12 @@
                 template.classList.add("tply-template");
                 template.innerHTML = exampleContainer.innerHTML;
                 exampleContainer.innerHTML = "";
+
+                let title = document.createElement("div");
+                title.classList.add("title");
+                title.innerText = exampleContainer.getAttribute("data-title");
+
+                exampleContainer.appendChild(title);
 
                 example.appendChild(template);
                 exampleContainer.appendChild(example);

@@ -15,15 +15,6 @@ body {
   line-height: 1.5em;
 }
 
-.title {
-  font-size: 4em;
-  margin-top: 25px;
-  margin-bottom: 50px;
-  font-weight: bolder;
-  text-align: center;
-  font-family: 'Lobster', cursive;
-}
-
 .container {
   width: $content-width;
   max-width: $max-content-width;
@@ -108,6 +99,14 @@ $chars: 100;
     position: relative;
     overflow: hidden;
     margin: 20px;
+
+    .title {
+      background-color: darken($back-color, 15);
+      padding: 3px 20px;
+      font-size: 12px;
+      font-weight: bold;
+      font-family: $font-monospace;
+    }
 
     .example {
       padding: 25px;

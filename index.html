@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/default.min.css">
     <link rel="stylesheet" href="/static/zenburn.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/highlight.min.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
     <script src="/dist/index.js"></script>
     <link rel="stylesheet" href="/css/global.css">
 </head>
@@ -14,16 +13,14 @@
 <div class="container">
     <h1>tply demo</h1>
 
-    <div class="example-container">
-        <div class="example">
-            <div class="tply-template">
-                <type>this is an example</type>
-                <wait>500ms</wait>
+    <div class="examples">
+        <div class="example-container">
+            <div class="example">
+                <div class="tply-template">
+                    <type>this is an example</type>
+                    <wait>500ms</wait>
+                </div>
             </div>
-            <div class="tply-destination"></div>
-        </div>
-        <div class="code">
-            <pre><code class="html">asdf</code></pre>
         </div>
     </div>
 
@@ -70,17 +67,25 @@
                 return result;
             };
 
-            let examples = document.querySelectorAll(".example-container");
+            let examples = document.querySelectorAll(".examples .example-container");
 
             for (let i = 0; i < examples.length; i++) {
-                let example = examples[i];
+                let exampleContainer = examples[i];
 
-                let template = example.querySelector(".tply-template");
-                let destination = example.querySelector(".tply-destination");
+                let template = exampleContainer.querySelector(".tply-template");
+                let destination = document.createElement("div");
+                destination.classList.add(".tply-destination");
+                template.parentNode.appendChild(destination);
 
-                let code = example.querySelector(".code pre code");
+                let code = document.createElement("code");
+                let pre = document.createElement("pre");
 
-                code.innerText = unindentCode(template.innerHTML);
+                pre.innerText = unindentCode(template.innerHTML);
+
+                code.appendChild(pre);
+                exampleContainer.appendChild(code);
+
+                hljs.highlightBlock(code);
 
                 tply.animate(template, destination);
             }

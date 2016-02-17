@@ -1,6 +1,6 @@
 $back-color: rgb(255, 255, 255);
 $text-color: rgb(40, 40, 40);
-$content-width: 1000px;
+$content-width: 80vw;
 $max-content-width: 80vw;
 $font-monospace: 'Inconsolata', monospace;
 $font-normal: 'Open Sans', sans-serif;
@@ -91,31 +91,41 @@ $chars: 100;
   @return $component - 255 / 2;
 }
 
-.example-container {
-  background-color: darken($back-color, 10);
-  display: inline-block;
-  width: 500px;
-  height: 250px;
-  border-radius: 2px;
-  position: relative;
-  overflow: hidden;
+.examples {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-direction: row;
 
-  .example {
-    padding: 25px;
-    font-size: 15px;
+  .example-container {
+    background-color: darken($back-color, 10);
+    display: inline-block;
+    min-width: 400px;
+    min-height: 250px;
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+    margin: 20px;
+
+    .example {
+      padding: 25px;
+      font-size: 15px;
+    }
+
+    code {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+    }
   }
 
-  code {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
+  pre {
+    margin: 0;
   }
-}
 
-pre {
-  margin: 0;
-}
-
-.tply-template {
-  display: none;
+  .tply-template {
+    display: none;
+  }
 }

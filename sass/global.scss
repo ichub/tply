@@ -91,9 +91,12 @@ $chars: 100;
   flex-direction: row;
 
   .example-container {
+    $width: 400px;
+
     background-color: darken($back-color, 10);
     display: inline-block;
-    min-width: 400px;
+    min-width: $width;
+    max-width: $width;
     border-radius: 2px;
     position: relative;
     overflow: hidden;
@@ -145,4 +148,8 @@ $chars: 100;
 
 h1 {
   text-align: center;
+}
+
+.page-title {
+  font-size: 5em;
 }

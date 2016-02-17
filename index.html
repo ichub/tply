@@ -45,7 +45,7 @@
             "use strict";
 
             let unindentCode = function (text) {
-                let parts = text.split("\n").filter(function(item) {
+                let parts = text.split("\n").filter(function (item) {
                     return item.length > 0;
                 });
 
@@ -118,13 +118,19 @@
 
                 hljs.highlightBlock(code);
 
-                let cancellation = tply.animate(template, destination);
+                let status = tply.animate(template, destination);
 
-                redo.addEventListener("click", function() {
-                    cancellation.cancel(function() {
+                redo.addEventListener("click", function () {
+                    let restart = function () {
                         destination.innerHTML = "";
-                        cancellation = tply.animate(template, destination);
-                    });
+                        status = tply.animate(template, destination);
+                    };
+
+                    if (status.isFinished) {
+                        restart();
+                    } else {
+                        status.cancel(restart);
+                    }
                 });
             }
         })();

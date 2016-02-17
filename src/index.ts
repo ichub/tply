@@ -43,9 +43,12 @@
      * animation. Since some animations can be super long, there may arise a need to cancel
      * one at some time or another.
      */
-    class Cancellation {
+    class Status {
         private _isCancelled:boolean = false;
+        private _isFinished:boolean = false;
+
         private cancellationListeners:Array<() => void> = [];
+        private finishedListeners:Array<() => void> = [];
 
         public cancel(callback?:IVoidCallback):void {
             if (typeof callback !== "undefined") {
@@ -59,8 +62,20 @@
             this.cancellationListeners.push(listener);
         }
 
+        public registerFinishedListener(listener:() => void):void {
+            this.finishedListeners.push(listener);
+        }
+
         public onCancel():void {
             this.cancellationListeners.forEach((listener:() => void):void => {
+                listener();
+            });
+        }
+
+        public onFinish():void {
+            this._isFinished = true;
+
+            this.finishedListeners.forEach((listener:() => void):void => {
                 listener();
             });
         }
@@ -68,10 +83,14 @@
         public get isCancelled():boolean {
             return this._isCancelled;
         }
+
+        public get isFinished():boolean {
+            return this._isFinished;
+        }
     }
 
     class AnimationContext {
-        private _cancellation:Cancellation;
+        private _status:Status;
         private _config:IConfiguration;
         private _rootFrom:Node;
         private _from:Node;
@@ -80,14 +99,14 @@
         private _callback:IElementProcessorCallback;
         private _extra:any;
 
-        constructor(cancellation:Cancellation,
+        constructor(status:Status,
                     config:IConfiguration,
                     rootFrom:Node,
                     from:Node,
                     rootTo:HTMLElement,
                     to:HTMLElement,
                     callback:IElementProcessorCallback) {
-            this._cancellation = cancellation;
+            this._status = status;
             this._config = config;
             this._rootFrom = rootFrom;
             this._from = from;
@@ -98,7 +117,7 @@
 
         public clone():AnimationContext {
             return new AnimationContext(
-                this._cancellation,
+                this._status,
                 this._config,
                 this._rootFrom,
                 this._from,
@@ -131,8 +150,8 @@
             return clone;
         }
 
-        get cancellation():Cancellation {
-            return this._cancellation;
+        get status():Status {
+            return this._status;
         }
 
         get config():IConfiguration {
@@ -234,8 +253,8 @@
      */
     let makeProcessor = function (processFn:IElementProcessor):IElementProcessor {
         return function (context:AnimationContext):void {
-            if (context.cancellation.isCancelled) {
-                context.cancellation.onCancel();
+            if (context.status.isCancelled) {
+                context.status.onCancel();
                 // not calling the callback effectively
                 // stops the animation - this is deliberate.
                 return;
@@ -379,8 +398,8 @@
             return;
         }
 
-        if (context.cancellation.isCancelled) {
-            context.cancellation.onCancel();
+        if (context.status.isCancelled) {
+            context.status.onCancel();
             return;
         }
 
@@ -528,9 +547,19 @@
             animate: function (from:HTMLElement,
                                to:HTMLElement,
                                conf:IConfiguration = {},
-                               callback:() => void = () => null):Cancellation {
-                const cancellation = new Cancellation();
-                runAnimation(new AnimationContext(cancellation, conf, from, from, to, to, callback));
+                               callback:() => void = () => null):Status {
+                const cancellation = new Status();
+                runAnimation(new AnimationContext(
+                    cancellation,
+                    conf,
+                    from,
+                    from,
+                    to,
+                    to,
+                    function () {
+                        cancellation.onFinish();
+                        callback();
+                    }));
                 return cancellation;
             }
         };

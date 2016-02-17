@@ -93,6 +93,12 @@
                 title.classList.add("title");
                 title.innerText = exampleContainer.getAttribute("data-title");
 
+                let redo = document.createElement("div");
+                redo.classList.add("redo");
+                redo.innerText = "redo";
+
+                title.appendChild(redo);
+
                 exampleContainer.appendChild(title);
 
                 example.appendChild(template);
@@ -112,7 +118,14 @@
 
                 hljs.highlightBlock(code);
 
-                tply.animate(template, destination);
+                let cancellation = tply.animate(template, destination);
+
+                redo.addEventListener("click", function() {
+                    cancellation.cancel(function() {
+                        destination.innerHTML = "";
+                        cancellation = tply.animate(template, destination);
+                    });
+                });
             }
         })();
     </script>

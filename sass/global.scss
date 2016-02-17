@@ -105,6 +105,18 @@ $chars: 100;
       font-size: 12px;
       font-weight: bold;
       font-family: $font-monospace;
+
+      .redo {
+        display: inline;
+        float: right;
+        font-weight: normal;
+
+        &:hover {
+          text-decoration: underline;
+          font-weight: bold;
+          cursor: pointer;
+        }
+      }
     }
 
     .example {

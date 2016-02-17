@@ -15,20 +15,12 @@
 
     <div class="examples">
         <div class="example-container">
-            <div class="example">
-                <div class="tply-template">
-                    <type>this is an example</type>
-                    <wait>500ms</wait>
-                </div>
-            </div>
+            <type>this is an example</type>
+            <wait>500ms</wait>
         </div>
         <div class="example-container">
-            <div class="example">
-                <div class="tply-template">
-                    <type>this is an example</type>
-                    <wait>500ms</wait>
-                </div>
-            </div>
+            <type>this is an example</type>
+            <wait>500ms</wait>
         </div>
     </div>
 
@@ -80,7 +72,17 @@
             for (let i = 0; i < examples.length; i++) {
                 let exampleContainer = examples[i];
 
-                let template = exampleContainer.querySelector(".tply-template");
+                let example = document.createElement("div");
+                example.classList.add("example");
+
+                let template = document.createElement("div");
+                template.classList.add("tply-template");
+                template.innerHTML = exampleContainer.innerHTML;
+                exampleContainer.innerHTML = "";
+
+                example.appendChild(template);
+                exampleContainer.appendChild(example);
+
                 let destination = document.createElement("div");
                 destination.classList.add(".tply-destination");
                 template.parentNode.appendChild(destination);

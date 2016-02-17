@@ -112,6 +112,10 @@ $chars: 100;
     .example {
       padding: 25px;
       font-size: 15px;
+
+      .tply-template {
+        display: none;
+      }
     }
 
     code {
@@ -123,9 +127,5 @@ $chars: 100;
 
   pre {
     margin: 0;
-  }
-
-  .tply-template {
-    display: none;
   }
 }

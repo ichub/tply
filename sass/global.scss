@@ -94,7 +94,6 @@ $chars: 100;
     background-color: darken($back-color, 10);
     display: inline-block;
     min-width: 400px;
-    min-height: 250px;
     border-radius: 2px;
     position: relative;
     overflow: hidden;
@@ -115,11 +114,14 @@ $chars: 100;
       .tply-template {
         display: none;
       }
+
+      .tply-destination {
+        min-height: 100px;
+      }
     }
 
     code {
-      position: absolute;
-      bottom: 0;
+
       width: 100%;
     }
   }
@@ -127,4 +129,8 @@ $chars: 100;
   pre {
     margin: 0;
   }
+}
+
+h1 {
+  text-align: center;
 }

@@ -20,8 +20,23 @@
             </type>
         </div>
         <div class="example-container" data-title="pauses">
-            <type>this is an example</type>
+            <type>Once upon a time...</type>
             <wait>500ms</wait>
+            <br>
+            <type>There was a dramatic pause!</type>
+        </div>
+        <div class="example-container" data-title="repeats">
+            <repeat data-repeat="3">
+                <type>This will repeat three times!</type>
+                <br>
+            </repeat>
+        </div>
+        <div class="example-container" data-title="clears (and infinite repeat)">
+            <repeat data-repeat="infinite">
+                <type>This will repeat forever!</type>
+                <wait>1s</wait>
+                <clear_parent></clear_parent>
+            </repeat>
         </div>
     </div>
 
@@ -84,7 +99,7 @@
                 exampleContainer.appendChild(example);
 
                 let destination = document.createElement("div");
-                destination.classList.add(".tply-destination");
+                destination.classList.add("tply-destination");
                 template.parentNode.appendChild(destination);
 
                 let code = document.createElement("code");

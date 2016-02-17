@@ -15,10 +15,11 @@
 
     <div class="examples">
         <div class="example-container" data-title="simple text">
-            <type>this is an example</type>
-            <wait>500ms</wait>
+            <type>
+                Why, hello there! How are you? I'm good!
+            </type>
         </div>
-        <div class="example-container">
+        <div class="example-container" data-title="pauses">
             <type>this is an example</type>
             <wait>500ms</wait>
         </div>
@@ -29,37 +30,30 @@
             "use strict";
 
             let unindentCode = function (text) {
-                let nonWhitespaceFound = false;
-                let skippingWhitespace = false;
-                let skipCount = 0;
-                let whitespaceCount = 0;
-                let result = "";
-                let lastReturn = text.lastIndexOf("\n");
+                let parts = text.split("\n").filter(function(item) {
+                    return item.length > 0;
+                });
 
-                for (let i = 0; i < text.length; i++) {
-                    if (!nonWhitespaceFound) {
-                        if (text[i] == " ") {
-                            whitespaceCount++;
-                        } else if (text[i] != "\n") {
-                            result += text[i];
-                            nonWhitespaceFound = true;
+                let result = "";
+
+                if (parts.length > 0) {
+                    let count = 0;
+                    while (parts[0][count] == " " && count < parts[0].length) {
+                        count++;
+                    }
+
+                    for (let i = 0; i < parts.length; i++) {
+                        let part = parts[i];
+                        let partText = "";
+
+                        for (let j = count; j < parts[i].length; j++) {
+                            partText += part[j];
                         }
-                    } else {
-                        if (skippingWhitespace) {
-                            if (++skipCount >= whitespaceCount) {
-                                skippingWhitespace = false;
-                            }
-                        } else {
-                            if (text[i] == "\n") {
-                                if (i == lastReturn) {
-                                    break;
-                                }
-                                
-                                skippingWhitespace = true;
-                                result += text[i];
-                            } else {
-                                result += text[i];
-                            }
+
+                        result += partText;
+
+                        if (i < parts.length - 2) {
+                            result += "\n";
                         }
                     }
                 }

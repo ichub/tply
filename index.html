@@ -14,6 +14,7 @@
     <h1 class="page-title">tply demo</h1>
 
     <div class="examples">
+        <!--
         <div class="example-container" data-title="simple text">
             <type>
                 Why, hello there! How are you? I'm good!
@@ -45,11 +46,24 @@
                     flair!
                 </span>
             </type>
-        </div>
+        </div>-->
         <div class="example-container" data-title="customizing with attributes">
-            <type style="font-family:Inconsolata, monospace;">
-                I am a spooky robot!
+            <type data-type="robot">
+                I am a spooky spooky SPOOKY robot!
             </type>
+            <script type="application/json">
+                {
+                    "types": [
+                        {
+                            "name": "robot",
+                            "properties": {
+                                "data-char-interval": "0ms",
+                                "data-word-interval": "100ms"
+                            }
+                        }
+                    ]
+                }
+            </script>
         </div>
     </div>
 
@@ -91,8 +105,17 @@
 
             let examples = document.querySelectorAll(".examples .example-container");
 
+
             for (let i = 0; i < examples.length; i++) {
                 let exampleContainer = examples[i];
+
+                let configurationElement = exampleContainer.querySelector("script[type='application/json'");
+                let configObject = {};
+
+                if (configurationElement) {
+                    configObject = JSON.parse(configurationElement.innerText);
+                    exampleContainer.removeChild(configurationElement);
+                }
 
                 let example = document.createElement("div");
                 example.classList.add("example");
@@ -132,12 +155,12 @@
 
                 hljs.highlightBlock(code);
 
-                let status = tply.animate(template, destination);
+                let status = tply.animate(template, destination, configObject);
 
                 redo.addEventListener("click", function () {
                     let restart = function () {
                         destination.innerHTML = "";
-                        status = tply.animate(template, destination);
+                        status = tply.animate(template, destination, configObject);
                     };
 
                     if (status.isFinished) {
@@ -147,7 +170,8 @@
                     }
                 });
             }
-        })();
+        })
+        ();
     </script>
 </div>
 </body>

@@ -276,7 +276,10 @@
                                 }
                             }
 
-                            context.fromAsElement.classList.add(context.config.types[j].styleClasses || "");
+                            if (typeof context.config.types[j].styleClasses !== "undefined") {
+                                context.fromAsElement.classList.add(context.config.types[j].styleClasses);
+                            }
+
                             context.fromAsElement.setAttribute(
                                 "style",
                                 context.fromAsElement.getAttribute("style") + ";" + context.config.types[j].style);

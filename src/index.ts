@@ -8,6 +8,13 @@
         Comment = 8
     }
 
+    interface IProcessingConfigurationItem {
+        tag?: string;
+        id?: string;
+        cssClass?: string;
+        pre: (element:HTMLElement) => void;
+        post: (element:HTMLElement) => void;
+    }
     /**
      * Type of object used to configure the behavior of tply for a given animation.
      */
@@ -18,11 +25,7 @@
             styleClasses?: string,
             style?: string
         }];
-        processing?: [{
-            tag: string,
-            pre: (element:HTMLElement) => void,
-            post: (element:HTMLElement) => void
-        }];
+        processing?:IProcessingConfigurationItem[];
         shouldScrollDown?:boolean;
     }
 
@@ -245,6 +248,36 @@
         };
     };
 
+    let isDefined = function (object:any) {
+        return typeof object !== "undefined";
+    };
+
+    let ignoreCaseEquals = function (left:string, right:string):boolean {
+        return left.toLowerCase() === right.toLowerCase();
+    };
+
+    let matchElement = function (element:HTMLElement, processingItem:IProcessingConfigurationItem) {
+        if (isDefined(processingItem.tag)) {
+            if (!ignoreCaseEquals(element.tagName, processingItem.tag)) {
+                return false;
+            }
+        }
+
+        if (isDefined(processingItem.id)) {
+            if (element.id !== processingItem.id) {
+                return false;
+            }
+        }
+
+        if (isDefined(processingItem.cssClass)) {
+            if (!element.classList.contains(processingItem.cssClass)) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
     /**
      * Wraps a processor that does animation with some extra logic which enables us to
      * pre- and post- process elements, style them, and give them extra attributes defined
@@ -290,7 +323,7 @@
 
             if (Array.isArray(context.config.processing)) {
                 for (let k = 0; k < context.config.processing.length; k++) {
-                    if (context.fromAsElement.tagName.toLowerCase() === context.config.processing[k].tag.toLowerCase()) {
+                    if (matchElement(context.fromAsElement, context.config.processing[k])) {
                         if (typeof context.config.processing[k].pre === "function") {
                             context.config.processing[k].pre(context.fromAsElement);
                         }

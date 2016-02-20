@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>tply animation</title>
+    <style>
+        #tply-source {
+            display: none; /* we don't want our template to be visible */
+        }
+    </style>
+</head>
+<body>
+<div id="tply-source">
+    <!-- the html you see in each example goes here -->
+</div>
+<div id="tply-destination">
+    <!-- this is where stuff is rendered-->
+</div>
+<script>
+    tply.animate(
+            document.getElementById("tply-source"),
+            document.getElementById("tply-destination"),
+            {
+                /*
+                    this is where the configuration you see
+                    would go
+                 */
+            }
+    )
+</script>
+</body>
+</html>

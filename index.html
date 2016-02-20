@@ -13,6 +13,36 @@
 <div class="container">
     <h1 class="page-title">tply demo</h1>
 
+    <div id="explanation">
+        <code class="html">
+            <pre>
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;title&gt;tply animation&lt;/title&gt;
+    &lt;style&gt;
+        #tply-source {
+            display: none; /* we don&#39;t want our template to be visible */
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div id=&quot;tply-source&quot;&gt;
+    &lt;!-- the html you see in each example goes here --&gt;
+&lt;/div&gt;
+&lt;div id=&quot;tply-destination&quot;&gt;
+    &lt;!-- this is where stuff is rendered--&gt;
+&lt;/div&gt;
+&lt;script&gt;
+    tply.animate(
+            document.getElementById(&quot;tply-source&quot;),
+            document.getElementById(&quot;tply-destination&quot;),
+            { /* this is where the configuration you see would go */ });
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre></code>
+    </div>
+
     <div class="examples">
         <div class="example-container" data-title="simple text">
             <type>
@@ -112,6 +142,8 @@
     <script>
         (function () {
             "use strict";
+
+            hljs.highlightBlock(document.getElementById("explanation"));
 
             let unindentCode = function (text) {
                 let parts = text.split("\n").filter(function (item) {

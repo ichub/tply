@@ -135,14 +135,21 @@ $chars: 100;
       }
     }
 
-    code {
+    .separator {
+      background-color: lighten(#3f3f3f, 5);
+      color: #d7d7d7;
+      padding: 2px 10px;
+      font-size: 15px;
+      font-family: $font-monospace;
+    }
 
+    pre {
+      margin: 0;
+    }
+
+    code {
       width: 100%;
     }
-  }
-
-  pre {
-    margin: 0;
   }
 }
 

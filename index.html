@@ -14,7 +14,6 @@
     <h1 class="page-title">tply demo</h1>
 
     <div class="examples">
-        <!--
         <div class="example-container" data-title="simple text">
             <type>
                 Why, hello there! How are you? I'm good!
@@ -46,12 +45,12 @@
                     flair!
                 </span>
             </type>
-        </div>-->
+        </div>
         <div class="example-container" data-title="customizing with attributes">
             <type data-type="robot">
                 I am a spooky spooky SPOOKY robot!
             </type>
-            <script type="application/json">
+            <div class="configuration">
                 {
                     "types": [
                         {
@@ -63,7 +62,50 @@
                         }
                     ]
                 }
-            </script>
+
+            </div>
+        </div>
+        <div class="example-container" data-title="more customization">
+            <type data-type="cool">
+                I am the coolest in the whole entire world.
+            </type>
+            <div class="configuration">
+                {
+                    "types": [
+                        {
+                            "name": "cool",
+                            "properties": {
+                                "data-char-interval": "20ms"
+                            },
+                            "style": "color:blue;"
+                        }
+                    ]
+                }
+
+            </div>
+        </div>
+        <div class="example-container" data-title="more customization">
+            <type>
+                <span>cool</span>
+            </type>
+            <div class="configuration">
+                {
+                    "processing": [
+                        {
+                            "tag": "span",
+                            "pre": function(el) {
+                                el.innerText +=
+                                    ";DROP TABLE users --";
+                            },
+                            "post": function(el) {
+                                el.onclick = function() {
+                                    alert("cool (:");
+                                }
+                            }
+                        }
+                    ]
+                }
+            </div>
         </div>
     </div>
 
@@ -103,18 +145,27 @@
                 return result;
             };
 
-            let examples = document.querySelectorAll(".examples .example-container");
+            let createCodeElement = function (codeText, language) {
+                let code = document.createElement("code");
+                let pre = document.createElement("pre");
 
+                pre.innerText = unindentCode(codeText);
 
-            for (let i = 0; i < examples.length; i++) {
-                let exampleContainer = examples[i];
+                code.appendChild(pre);
+                code.classList.add(language);
 
-                let configurationElement = exampleContainer.querySelector("script[type='application/json'");
+                return code;
+            };
+
+            let createExample = function (exampleContainer) {
+                let configurationElement = exampleContainer.querySelector(".configuration");
                 let configObject = {};
+                let hasConfig = false;
 
                 if (configurationElement) {
-                    configObject = JSON.parse(configurationElement.innerText);
+                    configObject = eval("configObject = " + configurationElement.innerText);
                     exampleContainer.removeChild(configurationElement);
+                    hasConfig = true;
                 }
 
                 let example = document.createElement("div");
@@ -144,16 +195,20 @@
                 destination.classList.add("tply-destination");
                 template.parentNode.appendChild(destination);
 
-                let code = document.createElement("code");
-                let pre = document.createElement("pre");
-
-                pre.innerText = unindentCode(template.innerHTML);
-
-                code.appendChild(pre);
-                code.classList.add("html");
+                let code = createCodeElement(template.innerHTML, "html");
                 exampleContainer.appendChild(code);
-
                 hljs.highlightBlock(code);
+
+                if (hasConfig) {
+                    let separator = document.createElement("div");
+                    separator.classList.add("separator");
+                    separator.innerText = "With the following configuration:";
+                    exampleContainer.appendChild(separator);
+
+                    let config = createCodeElement(configurationElement.innerText, "javascript");
+                    exampleContainer.appendChild(config);
+                    hljs.highlightBlock(config);
+                }
 
                 let status = tply.animate(template, destination, configObject);
 
@@ -169,9 +224,16 @@
                         status.cancel(restart);
                     }
                 });
+            };
+
+            let examples = document.querySelectorAll(".examples .example-container");
+
+            for (let i = 0; i < examples.length; i++) {
+                let exampleContainer = examples[i];
+
+                createExample(exampleContainer)
             }
-        })
-        ();
+        })();
     </script>
 </div>
 </body>

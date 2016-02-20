@@ -425,17 +425,21 @@
     const processTypeNode = function (context:AnimationContext):void {
         switch (context.from.nodeType) {
             case NodeType.Element:
-                const appendedRoot = append(context.to, context.fromAsElement);
-                asynchronouslyProcessNodes(
-                    context,
-                    function (node:Node, callback:IVoidCallback):void {
-                        processTypeNode(
-                            context
-                                .withTo(appendedRoot)
-                                .withFrom(node)
-                                .withCallback(callback)
-                                .withExtra(context.extra || context.from));
-                    });
+                makeProcessor(function (context) {
+                    let appendedRoot = append(context.to, context.fromAsElement);
+                    context.callback(appendedRoot);
+                })(context.withCallback(function (appendedRoot:HTMLElement) {
+                    asynchronouslyProcessNodes(
+                        context,
+                        function (node:Node, callback:IVoidCallback):void {
+                            processTypeNode(
+                                context
+                                    .withTo(appendedRoot)
+                                    .withFrom(node)
+                                    .withCallback(callback)
+                                    .withExtra(context.extra || context.from));
+                        });
+                }));
                 break;
             case NodeType.Text:
                 writeText(context, stripWhitespace(context.fromAsCharacterData.data));

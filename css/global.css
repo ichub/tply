@@ -1,0 +1,124 @@
+body {
+  background-color: white;
+  font-family: "Open Sans", sans-serif;
+  color: #282828;
+  line-height: 1.5em; }
+
+.container {
+  width: 80vw;
+  max-width: 80vw;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 100px;
+  padding-bottom: 300px; }
+
+.no-char-fade .character {
+  animation: none; }
+
+@keyframes fadein {
+  from {
+    opacity: 0; }
+  to {
+    opacity: 1; } }
+
+.fadein, .character {
+  animation-name: fadein;
+  animation-duration: 300ms; }
+
+#google-video {
+  width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block; }
+
+p {
+  text-indent: 3em; }
+
+#source {
+  display: none; }
+
+.style {
+  background-color: #4b52a9;
+  color: white;
+  padding: 3px 10px 3px 10px;
+  font-size: 40px;
+  font-family: "Inconsolata", monospace;
+  line-height: 50px; }
+
+.examples {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-direction: row; }
+  .examples .example-container {
+    background-color: #e6e6e6;
+    display: inline-block;
+    min-width: 400px;
+    max-width: 400px;
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+    margin: 20px; }
+    .examples .example-container .title {
+      background-color: #d9d9d9;
+      padding: 3px 20px;
+      font-size: 12px;
+      font-weight: bold;
+      font-family: "Inconsolata", monospace; }
+      .examples .example-container .title .redo {
+        display: inline;
+        float: right;
+        font-weight: normal; }
+        .examples .example-container .title .redo:hover {
+          text-decoration: underline;
+          font-weight: bold;
+          cursor: pointer; }
+    .examples .example-container .example {
+      padding: 25px;
+      font-size: 15px; }
+      .examples .example-container .example .tply-template {
+        display: none; }
+      .examples .example-container .example .tply-destination {
+        min-height: 100px; }
+    .examples .example-container .separator {
+      background-color: #4c4c4c;
+      color: #d7d7d7;
+      padding: 2px 10px;
+      font-size: 15px;
+      font-family: "Inconsolata", monospace; }
+    .examples .example-container pre {
+      margin: 0; }
+    .examples .example-container code {
+      width: 100%; }
+
+h1 {
+  text-align: center; }
+
+.page-title {
+  font-size: 5em;
+  margin-bottom: 1em; }
+
+#explanation {
+  margin-top: 50px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 80vw;
+  border-radius: 2px;
+  overflow: hidden; }
+  #explanation .title {
+    background-color: #d9d9d9;
+    padding: 3px 20px;
+    font-size: 12px;
+    font-weight: bold;
+    font-family: "Inconsolata", monospace; }
+  #explanation #explanation-text {
+    padding: 10px 20px;
+    font-size: 14px;
+    background-color: #e6e6e6; }
+
+.github-container {
+  display: flex;
+  justify-content: center;
+  align-items: center; }

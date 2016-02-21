@@ -1,6 +1,4 @@
 node_modules
-css
-dist
 .idea
 .DS_Store
 src/typings

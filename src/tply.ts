@@ -27,6 +27,7 @@
         }];
         processing?:IProcessingConfigurationItem[];
         shouldScrollDown?:boolean;
+        insertedClass?:string;
     }
 
     interface IElementProcessorCallback extends Function {
@@ -543,7 +544,7 @@
     const processDefaultNode = makeProcessor(function (context:AnimationContext):void {
         const noAnimateContents = context.fromAsElement.getAttribute("data-ignore-tply") === "true";
         const clone = append(context.to, context.fromAsElement, null, noAnimateContents);
-        clone.classList.add("fadein");
+        clone.classList.add(context.config.insertedClass || "fadein");
 
         if (noAnimateContents) {
             context.callback(clone);

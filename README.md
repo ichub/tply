@@ -73,6 +73,7 @@ The configuration object follows this schema:
         * `style` - a css string to put in the `style` attribute of all elements with this type
     * `processing` - an array of:
         * `tag` - a string with the tag name to match (eg. `div`)
+        * `id` - a string with the id to match 
         * `pre` - a function that takes one parameter - an HTML Element - which tply will apply to all matching
         elements before they are inserted into the destination
         * `post` - same as `pre`, but applied after the element is inserted into the destination

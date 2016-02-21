@@ -5,9 +5,6 @@ $max-content-width: 80vw;
 $font-monospace: 'Inconsolata', monospace;
 $font-normal: 'Open Sans', sans-serif;
 
-$accent-blue: rgb(50, 38, 197);
-$accent-2: rgb(148, 64, 114);
-
 body {
   background-color: $back-color;
   font-family: $font-normal;
@@ -163,7 +160,24 @@ h1 {
 }
 
 #explanation {
-  width: 600px;
+  margin-top: 50px;
   margin-left: auto;
   margin-right: auto;
+  width: $content-width;
+  border-radius: 2px;
+  overflow: hidden;
+
+  .title {
+    background-color: darken($back-color, 15);
+    padding: 3px 20px;
+    font-size: 12px;
+    font-weight: bold;
+    font-family: $font-monospace;
+  }
+
+  #explanation-text {
+    padding: 10px 20px;
+    font-size: 14px;
+    background-color: darken($back-color, 10);
+  }
 }

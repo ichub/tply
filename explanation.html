@@ -1,13 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>tply animation</title>
     <style>
         #tply-source {
             display: none; /* we don't want our template to be visible */
         }
     </style>
+    <script src="tply.js"></script> <!-- a reference to the tply file -->
 </head>
 <body>
 <div id="tply-source">
@@ -20,13 +19,7 @@
     tply.animate(
             document.getElementById("tply-source"),
             document.getElementById("tply-destination"),
-            {
-                /*
-                    this is where the configuration you see
-                    would go
-                 */
-            }
-    )
+            { /*this is where the configuration you see would go */ });
 </script>
 </body>
 </html>

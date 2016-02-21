@@ -77,6 +77,8 @@ The configuration object follows this schema:
         * `pre` - a function that takes one parameter - an HTML Element - which tply will apply to all matching
         elements before they are inserted into the destination
         * `post` - same as `pre`, but applied after the element is inserted into the destination
+    * `insertedClass` - class to add to all elements inserted throughout the animation. Default is `fadein`.
+    * `shouldScrollDown` - whether or not to scroll to the bottom of the page after each inserted element.
         
 #### Configuration Example
 Here is an example `animate` invocation with a configuration object.

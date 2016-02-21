@@ -1,4 +1,5 @@
 # tply
+[View the demo here!](https://ichub.github.io/tply/)
 
 This library allows you to simulate text being typed out character by character. Here's a "hello world" example:
 

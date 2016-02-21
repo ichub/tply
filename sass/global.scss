@@ -181,3 +181,9 @@ h1 {
     background-color: darken($back-color, 10);
   }
 }
+
+.github-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

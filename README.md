@@ -178,7 +178,7 @@ The stuff within a `repeat` element will be repeated a given amount of times.
 </repeat>
 ```
 
-### `clear_parent`
+### `clearparent`
 Removes all children of its parent element.
 
 ##### example
@@ -187,11 +187,11 @@ Removes all children of its parent element.
     <type>this is some text</type>
     <img src="a source"/>
     <wait>500ms</wait>
-    <clear_parent></clear_parent>
+    <clearparent></clearparent>
 <div>
 ```
 
-### `clear_all`
+### `clearall`
 Removes all children of the root animation source.
 
 ##### example
@@ -200,7 +200,7 @@ Removes all children of the root animation source.
     wow
     <div>
         nice
-        <span><clear_all></clear_all></span>
+        <span><clearall></clearall></span>
     </div>
 </div>
 ```

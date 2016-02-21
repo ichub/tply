@@ -535,8 +535,8 @@
     const processors:{[key:string]:IElementProcessor} = {
         "type": makeProcessor(processTypeNode),
         "wait": makeProcessor(processWaitNode),
-        "clear_parent": makeProcessor(processClearParentNode),
-        "clear_all": makeProcessor(processClearAllNode),
+        "clearparent": makeProcessor(processClearParentNode),
+        "clearall": makeProcessor(processClearAllNode),
         "repeat": makeProcessor(processRepeatNode)
     };
 

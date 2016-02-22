@@ -550,7 +550,12 @@
         "wait": makeProcessor(processWaitNode),
         "clearparent": makeProcessor(processClearParentNode),
         "clearall": makeProcessor(processClearAllNode),
-        "repeat": makeProcessor(processRepeatNode)
+        "repeat": makeProcessor(processRepeatNode),
+        "delete": makeProcessor(processDeleteNode)
+    };
+
+    const processDeleteNode = function(context:AnimationContext) {
+        context.callback(null);
     };
 
     const processDefaultNode = makeProcessor(function (context:AnimationContext):void {

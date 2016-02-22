@@ -528,7 +528,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         "wait": makeProcessor(processWaitNode),
         "clearparent": makeProcessor(processClearParentNode),
         "clearall": makeProcessor(processClearAllNode),
-        "repeat": makeProcessor(processRepeatNode)
+        "repeat": makeProcessor(processRepeatNode),
+        "delete": makeProcessor(processDeleteNode)
+    };
+    var processDeleteNode = function processDeleteNode(context) {
+        context.callback(null);
     };
     var processDefaultNode = makeProcessor(function (context) {
         var noAnimateContents = context.fromAsElement.getAttribute("data-ignore-tply") === "true";

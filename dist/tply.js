@@ -554,13 +554,33 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         };
         deleteChar();
     };
+    var processDeleteWordsNode = function processDeleteWordsNode(context) {
+        var count = 0;
+        var wordDeleteCount = parseInt(context.fromAsElement.getAttribute("data-words"), 10);
+        var deleteChar = function deleteChar() {
+            if (count == wordDeleteCount) {
+                context.callback(null);
+                return;
+            }
+            var index = context.insertedChars.length - 1;
+            var currentChar = context.insertedChars[index];
+            currentChar.parentElement.removeChild(currentChar);
+            context.insertedChars.pop();
+            if (/\s+/.test(innerText(currentChar))) {
+                count++;
+            }
+            setTimeout(deleteChar, 100);
+        };
+        deleteChar();
+    };
     var processors = {
         "type": makeProcessor(processTypeNode),
         "wait": makeProcessor(processWaitNode),
         "clearparent": makeProcessor(processClearParentNode),
         "clearall": makeProcessor(processClearAllNode),
         "repeat": makeProcessor(processRepeatNode),
-        "delete": makeProcessor(processDeleteNode)
+        "delete": makeProcessor(processDeleteNode),
+        "deletewords": makeProcessor(processDeleteWordsNode)
     };
     var processDefaultNode = makeProcessor(function (context) {
         var noAnimateContents = context.fromAsElement.getAttribute("data-ignore-tply") === "true";

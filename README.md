@@ -212,6 +212,20 @@ Removes all children of the root animation source.
 </div>
 ```
 
+### `delete`
+Delete's the last `n` characters written by tply.
+
+##### attributes
+* `data-chars` - the amount of characters to delete
+* `data-ignore-whitespace` - booleanm whether or not to ignore whitespace characters in counting (whitespace characters
+will still be ignored.
+
+##### example
+```html
+<type>wow</type>
+<delete data-chars="3"></delete>
+```
+
 ## Contributing
 
 ### Development

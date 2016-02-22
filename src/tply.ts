@@ -54,6 +54,7 @@
         private cancellationListeners:Array<() => void> = [];
         private finishedListeners:Array<() => void> = [];
 
+
         public cancel(callback?:IVoidCallback):void {
             if (typeof callback !== "undefined") {
                 this.registerCancellationListener(callback);
@@ -102,6 +103,7 @@
         private _to:HTMLElement;
         private _callback:IElementProcessorCallback;
         private _extra:any;
+        private _insertedChars:Array<HTMLElement> = [];
 
         constructor(status:Status,
                     config:IConfiguration,
@@ -109,7 +111,8 @@
                     from:Node,
                     rootTo:HTMLElement,
                     to:HTMLElement,
-                    callback:IElementProcessorCallback) {
+                    callback:IElementProcessorCallback,
+                    insertedChars = []) {
             this._status = status;
             this._config = config;
             this._rootFrom = rootFrom;
@@ -117,6 +120,7 @@
             this._rootTo = rootTo;
             this._to = to;
             this._callback = callback;
+            this._insertedChars = insertedChars;
         }
 
         public clone():AnimationContext {
@@ -127,7 +131,8 @@
                 this._from,
                 this._rootTo,
                 this._to,
-                this._callback);
+                this._callback,
+                this._insertedChars);
         }
 
         public withFrom(root:Node):AnimationContext {
@@ -203,6 +208,10 @@
 
         get rootTo():HTMLElement {
             return this._rootTo;
+        }
+
+        public get insertedChars():Array<HTMLElement> {
+            return this._insertedChars;
         }
     }
 
@@ -452,7 +461,11 @@
             return;
         }
 
-        context.to.appendChild(createCharacterElement(text[0]));
+        const charElement = createCharacterElement(text[0]);
+
+        context.to.appendChild(charElement);
+
+        context.insertedChars.push(<HTMLElement> charElement);
 
         const interval = mapFirstCharToInterval(context, text);
 
@@ -545,6 +558,33 @@
         processAgain();
     };
 
+    const processDeleteNode = function (context:AnimationContext) {
+        let count = 0;
+        const deleteCount = parseInt(context.fromAsElement.getAttribute("data-chars"), 10);
+        const ignoreWhitespace = context.fromAsElement.getAttribute("data-ignore-whitespace") || "false";
+
+        let deleteChar = function () {
+            if (count == deleteCount) {
+                context.callback(null);
+                return;
+            }
+
+            let index = context.insertedChars.length - 1;
+            let currentChar = context.insertedChars[index];
+
+            currentChar.parentElement.removeChild(currentChar);
+            context.insertedChars.pop();
+
+            if (!/\s+/.test(innerText(currentChar))) {
+                count++;
+            }
+
+            setTimeout(deleteChar, 100);
+        };
+
+        deleteChar();
+    };
+
     const processors:{[key:string]:IElementProcessor} = {
         "type": makeProcessor(processTypeNode),
         "wait": makeProcessor(processWaitNode),
@@ -554,9 +594,6 @@
         "delete": makeProcessor(processDeleteNode)
     };
 
-    const processDeleteNode = function(context:AnimationContext) {
-        context.callback(null);
-    };
 
     const processDefaultNode = makeProcessor(function (context:AnimationContext):void {
         const noAnimateContents = context.fromAsElement.getAttribute("data-ignore-tply") === "true";

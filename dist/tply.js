@@ -142,8 +142,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     var AnimationContext = function () {
         function AnimationContext(status, config, rootFrom, from, rootTo, to, callback) {
+            var insertedChars = arguments.length <= 7 || arguments[7] === undefined ? [] : arguments[7];
+
             _classCallCheck(this, AnimationContext);
 
+            this._insertedChars = [];
             this._status = status;
             this._config = config;
             this._rootFrom = rootFrom;
@@ -151,12 +154,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             this._rootTo = rootTo;
             this._to = to;
             this._callback = callback;
+            this._insertedChars = insertedChars;
         }
 
         _createClass(AnimationContext, [{
             key: "clone",
             value: function clone() {
-                return new AnimationContext(this._status, this._config, this._rootFrom, this._from, this._rootTo, this._to, this._callback);
+                return new AnimationContext(this._status, this._config, this._rootFrom, this._from, this._rootTo, this._to, this._callback, this._insertedChars);
             }
         }, {
             key: "withFrom",
@@ -248,6 +252,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: "rootTo",
             get: function get() {
                 return this._rootTo;
+            }
+        }, {
+            key: "insertedChars",
+            get: function get() {
+                return this._insertedChars;
             }
         }]);
 
@@ -456,7 +465,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             context.status.onCancel();
             return;
         }
-        context.to.appendChild(createCharacterElement(text[0]));
+        var charElement = createCharacterElement(text[0]);
+        context.to.appendChild(charElement);
+        context.insertedChars.push(charElement);
         var interval = mapFirstCharToInterval(context, text);
         var continueWriting = function continueWriting() {
             writeText(context, text.slice(1));
@@ -523,6 +534,26 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         };
         processAgain();
     };
+    var processDeleteNode = function processDeleteNode(context) {
+        var count = 0;
+        var deleteCount = parseInt(context.fromAsElement.getAttribute("data-chars"), 10);
+        var ignoreWhitespace = context.fromAsElement.getAttribute("data-ignore-whitespace") || "false";
+        var deleteChar = function deleteChar() {
+            if (count == deleteCount) {
+                context.callback(null);
+                return;
+            }
+            var index = context.insertedChars.length - 1;
+            var currentChar = context.insertedChars[index];
+            currentChar.parentElement.removeChild(currentChar);
+            context.insertedChars.pop();
+            if (!/\s+/.test(innerText(currentChar))) {
+                count++;
+            }
+            setTimeout(deleteChar, 100);
+        };
+        deleteChar();
+    };
     var processors = {
         "type": makeProcessor(processTypeNode),
         "wait": makeProcessor(processWaitNode),
@@ -530,9 +561,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         "clearall": makeProcessor(processClearAllNode),
         "repeat": makeProcessor(processRepeatNode),
         "delete": makeProcessor(processDeleteNode)
-    };
-    var processDeleteNode = function processDeleteNode(context) {
-        context.callback(null);
     };
     var processDefaultNode = makeProcessor(function (context) {
         var noAnimateContents = context.fromAsElement.getAttribute("data-ignore-tply") === "true";

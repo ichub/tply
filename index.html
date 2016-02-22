@@ -30,13 +30,15 @@
             <br>
             <type>There was a dramatic pause!</type>
         </div>
-        <div class="example-container" data-title="more customization">
+        <div class="example-container" data-title="delete previously tiped characters">
             <type>
-                <span>cool</span>
+                <span>this text will be deleted</span>
             </type>
-            <delete data-chars="4"></delete>
+            <wait>500ms</wait>
+            <delete data-chars="21" data-ignore-whitespace="true"></delete>
+            <wait>500ms</wait>
             <type>
-                asdf
+                told you :P
             </type>
         </div>
         <div class="example-container" data-title="repeats">

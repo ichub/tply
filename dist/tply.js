@@ -254,6 +254,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return AnimationContext;
     }();
 
+    var innerText = function innerText(element) {
+        return element.innerText || element.textContent;
+    };
+    var setInnerText = function setInnerText(element, text) {
+        if (typeof element.innerText !== "undefined") {
+            element.innerText = text;
+        } else {
+            element.textContent = text;
+        }
+    };
     var asynchronouslyProcessNodes = function asynchronouslyProcessNodes(context, processFn) {
         var callbackParam = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 
@@ -431,7 +441,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     var createCharacterElement = function createCharacterElement(char) {
         var charElement = document.createElement("span");
         charElement.classList.add("character");
-        charElement.innerText = char;
+        setInnerText(charElement, char);
         return charElement;
     };
     /**
@@ -479,7 +489,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }
     };
     var processWaitNode = function processWaitNode(context) {
-        var duration = parseDuration(context.fromAsElement.innerText);
+        var duration = parseDuration(innerText(context.fromAsElement));
         setTimeout(function () {
             context.callback(null);
         }, duration);

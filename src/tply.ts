@@ -206,6 +206,18 @@
         }
     }
 
+    const innerText = function (element:HTMLElement):string {
+        return element.innerText || element.textContent;
+    };
+
+    const setInnerText = function (element:HTMLElement, text:string):void {
+        if (typeof element.innerText !== "undefined") {
+            element.innerText = text;
+        } else {
+            element.textContent = text;
+        }
+    };
+
     const asynchronouslyProcessNodes = function (context:AnimationContext,
                                                  processFn:(item:Node, callback:() => void) => void,
                                                  callbackParam:Node = null):void {
@@ -421,7 +433,7 @@
         const charElement = document.createElement("span");
 
         charElement.classList.add("character");
-        charElement.innerText = char;
+        setInnerText(charElement, char);
 
         return charElement;
     };
@@ -485,7 +497,7 @@
     };
 
     const processWaitNode = function (context:AnimationContext):void {
-        const duration = parseDuration(context.fromAsElement.innerText);
+        const duration = parseDuration(innerText(context.fromAsElement));
 
         setTimeout(
             function ():void {

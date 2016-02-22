@@ -17,6 +17,7 @@ const tslint = require("gulp-tslint");
 const tsfmt = require("gulp-tsfmt");
 const changedInPlace = require("gulp-changed-in-place");
 const babel = require('gulp-babel');
+const rename = require("gulp-rename");
 
 let cli = commandLineArgs([
     {name: 'production', alias: 'p', type: Boolean, defaultOption: false}
@@ -64,8 +65,13 @@ gulp.task('ts', function () {
             .pipe(browserify({
                 insertGlobals: false
             }))
-            .pipe(gulpif(options.production, uglify()))
             .pipe(gulp.dest('dist'))
+            .pipe(uglify())
+            .pipe(rename(function (path) {
+                path.basename += ".min"
+            }))
+            .pipe(gulp.dest('dist'))
+
     ]);
 });
 

@@ -560,11 +560,11 @@
 
     const processDeleteNode = function (context:AnimationContext) {
         let count = 0;
-        const deleteCount = parseInt(context.fromAsElement.getAttribute("data-chars"), 10);
+        const charDeleteCount = parseInt(context.fromAsElement.getAttribute("data-chars"), 10);
         const ignoreWhitespace = context.fromAsElement.getAttribute("data-ignore-whitespace") || "false";
 
         let deleteChar = function () {
-            if (count == deleteCount) {
+            if (count == charDeleteCount) {
                 context.callback(null);
                 return;
             }
@@ -585,13 +585,40 @@
         deleteChar();
     };
 
+    const processDeleteWordsNode = function(context: AnimationContext) {
+        let count = 0;
+        const wordDeleteCount = parseInt(context.fromAsElement.getAttribute("data-words"), 10);
+
+        let deleteChar = function () {
+            if (count == wordDeleteCount) {
+                context.callback(null);
+                return;
+            }
+
+            let index = context.insertedChars.length - 1;
+            let currentChar = context.insertedChars[index];
+
+            currentChar.parentElement.removeChild(currentChar);
+            context.insertedChars.pop();
+
+            if (/\s+/.test(innerText(currentChar))) {
+                count++;
+            }
+
+            setTimeout(deleteChar, 100);
+        };
+
+        deleteChar();
+    };
+
     const processors:{[key:string]:IElementProcessor} = {
         "type": makeProcessor(processTypeNode),
         "wait": makeProcessor(processWaitNode),
         "clearparent": makeProcessor(processClearParentNode),
         "clearall": makeProcessor(processClearAllNode),
         "repeat": makeProcessor(processRepeatNode),
-        "delete": makeProcessor(processDeleteNode)
+        "delete": makeProcessor(processDeleteNode),
+        "deletewords": makeProcessor(processDeleteWordsNode)
     };
 
 

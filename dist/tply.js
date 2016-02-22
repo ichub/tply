@@ -536,10 +536,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     };
     var processDeleteNode = function processDeleteNode(context) {
         var count = 0;
-        var deleteCount = parseInt(context.fromAsElement.getAttribute("data-chars"), 10);
+        var charDeleteCount = parseInt(context.fromAsElement.getAttribute("data-chars"), 10);
         var ignoreWhitespace = context.fromAsElement.getAttribute("data-ignore-whitespace") || "false";
         var deleteChar = function deleteChar() {
-            if (count == deleteCount) {
+            if (count == charDeleteCount) {
                 context.callback(null);
                 return;
             }

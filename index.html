@@ -154,6 +154,18 @@
 
             hljs.highlightBlock(document.querySelector("#explanation code"));
 
+            let innerText = function(element) {
+                return element.innerText || element.textContent;
+            };
+
+            let setInnerText = function(element, text) {
+                if (typeof element.innerText !== "undefined") {
+                    element.innerText = text;
+                } else {
+                    element.textContent = text;
+                }
+            };
+
             let unindentCode = function (text) {
                 let parts = text.split("\n").filter(function (item) {
                     return item.length > 0;
@@ -190,7 +202,7 @@
                 let code = document.createElement("code");
                 let pre = document.createElement("pre");
 
-                pre.innerText = unindentCode(codeText);
+                setInnerText(pre, unindentCode(codeText))
 
                 code.appendChild(pre);
                 code.classList.add(language);
@@ -203,8 +215,8 @@
                 let configObject = {};
                 let hasConfig = false;
 
-                if (configurationElement) {
-                    configObject = eval("configObject = " + configurationElement.innerText);
+                if (configurationElement !== null && typeof configurationElement !== "undefined") {
+                    configObject = eval("configObject = " + innerText(configurationElement));
                     exampleContainer.removeChild(configurationElement);
                     hasConfig = true;
                 }
@@ -219,11 +231,11 @@
 
                 let title = document.createElement("div");
                 title.classList.add("title");
-                title.innerText = exampleContainer.getAttribute("data-title");
+                setInnerText(title, exampleContainer.getAttribute("data-title"));
 
                 let redo = document.createElement("div");
                 redo.classList.add("redo");
-                redo.innerText = "redo";
+                setInnerText(redo, "redo");
 
                 title.appendChild(redo);
 
@@ -243,10 +255,10 @@
                 if (hasConfig) {
                     let separator = document.createElement("div");
                     separator.classList.add("separator");
-                    separator.innerText = "With the following configuration:";
+                    setInnerText(separator, "With the following configuration:");
                     exampleContainer.appendChild(separator);
 
-                    let config = createCodeElement(configurationElement.innerText, "javascript");
+                    let config = createCodeElement(innerText(configurationElement), "javascript");
                     exampleContainer.appendChild(config);
                     hljs.highlightBlock(config);
                 }

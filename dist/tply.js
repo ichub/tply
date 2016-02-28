@@ -430,11 +430,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var defaultCommaInterval = "300ms";
         var defaultEndInterval = "0ms";
         var defaultWordInterval = "0ms";
-        var charInterval = parseDuration(referenceTypeNode.getAttribute("data-char-interval") || defaultCharInterval);
-        var periodInterval = parseDuration(referenceTypeNode.getAttribute("data-period-interval") || defaultPeriodInterval);
-        var commaInterval = parseDuration(referenceTypeNode.getAttribute("data-comma-interval") || defaultCommaInterval);
-        var endInterval = parseDuration(referenceTypeNode.getAttribute("data-end-interval") || defaultEndInterval);
-        var wordInterval = parseDuration(referenceTypeNode.getAttribute("data-word-interval") || defaultWordInterval);
+        var dataCharInterval = null;
+        var dataPeriodInterval = null;
+        var dataCommaInterval = null;
+        var dataEndInterval = null;
+        var dataWordInterval = null;
+        if (typeof referenceTypeNode.getAttribute === "function") {
+            var _dataCharInterval = referenceTypeNode.getAttribute("data-char-interval");
+            var _dataPeriodInterval = referenceTypeNode.getAttribute("data-period-interval");
+            var _dataCommaInterval = referenceTypeNode.getAttribute("data-comma-interval");
+            var _dataEndInterval = referenceTypeNode.getAttribute("data-end-interval");
+            var _dataWordInterval = referenceTypeNode.getAttribute("data-word-interval");
+        }
+        var charInterval = parseDuration(dataCharInterval || defaultCharInterval);
+        var periodInterval = parseDuration(dataPeriodInterval || defaultPeriodInterval);
+        var commaInterval = parseDuration(dataCommaInterval || defaultCommaInterval);
+        var endInterval = parseDuration(dataEndInterval || defaultEndInterval);
+        var wordInterval = parseDuration(dataWordInterval || defaultWordInterval);
         var char = text[0];
         if (text.length === 1) {
             return endInterval;
@@ -479,6 +491,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             setTimeout(continueWriting, interval);
         }
     };
+    var createCursor = function createCursor() {
+        var cursor = document.createElement("div");
+        cursor.style.display = "inline-block";
+        cursor.style.width = "10px";
+        cursor.style.height = "10px";
+        cursor.style.backgroundColor = "black";
+        return cursor;
+    };
+    var createTypeDestination = function createTypeDestination() {
+        var destination = document.createElement("span");
+        return destination;
+    };
     var processTypeNode = function processTypeNode(context) {
         switch (context.from.nodeType) {
             case NodeType.Element:
@@ -492,7 +516,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }));
                 break;
             case NodeType.Text:
-                writeText(context, stripWhitespace(context.fromAsCharacterData.data));
+                var cursor = createCursor();
+                var destination = createTypeDestination();
+                context.to.appendChild(destination);
+                context.to.appendChild(cursor);
+                writeText(context.withTo(destination), stripWhitespace(context.fromAsCharacterData.data));
                 break;
             default:
                 context.callback(null);

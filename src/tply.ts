@@ -417,11 +417,25 @@
         const defaultEndInterval = "0ms";
         const defaultWordInterval = "0ms";
 
-        const charInterval = parseDuration(referenceTypeNode.getAttribute("data-char-interval") || defaultCharInterval);
-        const periodInterval = parseDuration(referenceTypeNode.getAttribute("data-period-interval") || defaultPeriodInterval);
-        const commaInterval = parseDuration(referenceTypeNode.getAttribute("data-comma-interval") || defaultCommaInterval);
-        const endInterval = parseDuration(referenceTypeNode.getAttribute("data-end-interval") || defaultEndInterval);
-        const wordInterval = parseDuration(referenceTypeNode.getAttribute("data-word-interval") || defaultWordInterval);
+        let dataCharInterval = null;
+        let dataPeriodInterval = null;
+        let dataCommaInterval = null;
+        let dataEndInterval = null;
+        let dataWordInterval = null;
+
+        if (typeof referenceTypeNode.getAttribute === "function") {
+            const dataCharInterval = referenceTypeNode.getAttribute("data-char-interval");
+            const dataPeriodInterval = referenceTypeNode.getAttribute("data-period-interval");
+            const dataCommaInterval = referenceTypeNode.getAttribute("data-comma-interval");
+            const dataEndInterval = referenceTypeNode.getAttribute("data-end-interval");
+            const dataWordInterval = referenceTypeNode.getAttribute("data-word-interval");
+        }
+
+        const charInterval = parseDuration(dataCharInterval || defaultCharInterval);
+        const periodInterval = parseDuration(dataPeriodInterval || defaultPeriodInterval);
+        const commaInterval = parseDuration(dataCommaInterval || defaultCommaInterval);
+        const endInterval = parseDuration(dataEndInterval || defaultEndInterval);
+        const wordInterval = parseDuration(dataWordInterval || defaultWordInterval);
 
         const char = text[0];
 
@@ -481,6 +495,22 @@
         }
     };
 
+    const createCursor = function ():HTMLElement {
+        const cursor = document.createElement("div");
+
+        cursor.style.display = "inline-block";
+        cursor.style.width = "10px";
+        cursor.style.height = "10px";
+        cursor.style.backgroundColor = "black";
+
+        return cursor;
+    };
+
+    const createTypeDestination = function ():HTMLElement {
+        const destination = document.createElement("span");
+        return destination;
+    };
+
     const processTypeNode = function (context:AnimationContext):void {
         switch (context.from.nodeType) {
             case NodeType.Element:
@@ -501,7 +531,14 @@
                 }));
                 break;
             case NodeType.Text:
-                writeText(context, stripWhitespace(context.fromAsCharacterData.data));
+                const cursor = createCursor();
+                const destination = createTypeDestination();
+                context.to.appendChild(destination);
+                context.to.appendChild(cursor);
+                writeText(
+                    context
+                        .withTo(destination),
+                    stripWhitespace(context.fromAsCharacterData.data));
                 break;
             default:
                 context.callback(null);
@@ -585,7 +622,7 @@
         deleteChar();
     };
 
-    const processDeleteWordsNode = function(context: AnimationContext) {
+    const processDeleteWordsNode = function (context:AnimationContext) {
         let count = 0;
         const wordDeleteCount = parseInt(context.fromAsElement.getAttribute("data-words"), 10);
 

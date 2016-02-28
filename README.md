@@ -32,7 +32,7 @@ tply allows you to simulate text being typed out character by character. Here's 
 </html>
 ```
 
-## Documentation - Js
+## Javascript Interface
 tply renders the markup within the source element into the destination element. tply renders each element one by one,
 in the order that they appear in the source element. You can create a template within html (make sure to hide it using 
 css, or your content will show up twice), and then render it into a destination element.
@@ -129,7 +129,34 @@ And here is the corresponding HTML:
 </div>
 ```
 
-## Documentation - HTML
+## Cursor
+
+All typed text is followed by a cursor, which is a css-styled div element. Here's the style I used to make blink (by 
+default it just looks like a black square):
+
+```css
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.2;
+
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.cursor {
+  animation: blink 0.8s linear infinite alternate;
+  background-color: rgb(84, 84, 84) !important;
+}
+```
+
+## Custom Elements
 
 In addition to being able to use any existing html element, you can also use one of these:
 

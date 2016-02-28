@@ -525,9 +525,10 @@
         const cursor = document.createElement("div");
 
         cursor.style.display = "inline-block";
-        cursor.style.width = "10px";
-        cursor.style.height = "10px";
+        cursor.style.width = "0.5em";
+        cursor.style.height = "1em";
         cursor.style.backgroundColor = "black";
+        cursor.style.marginLeft = "3px";
 
         if (context.cursor !== null) {
             context.cursor.parentNode.removeChild(context.cursor);

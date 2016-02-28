@@ -529,6 +529,7 @@
         cursor.style.height = "1em";
         cursor.style.backgroundColor = "black";
         cursor.style.marginLeft = "3px";
+        cursor.classList.add("cursor");
 
         if (context.cursor !== null) {
             context.cursor.parentNode.removeChild(context.cursor);

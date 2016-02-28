@@ -122,3 +122,15 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center; }
+
+@keyframes blink {
+  0% {
+    opacity: 1; }
+  50% {
+    opacity: 0.2; }
+  100% {
+    opacity: 1; } }
+
+.cursor {
+  animation: blink 0.5s linear infinite alternate;
+  background-color: black; }

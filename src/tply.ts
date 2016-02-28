@@ -491,7 +491,7 @@
      * This is where the magic happens - here we type out text into an HTML Element.
      */
     const writeText = function (context:AnimationContext, text:string):void {
-        if (text === "") {
+        if (text === "" || text === " ") {
             context.callback(null);
             return;
         }
@@ -502,17 +502,15 @@
         }
 
         const charElement = createCharacterElement(text[0]);
-
-        context.to.appendChild(charElement);
-
-        context.insertedChars.push(<HTMLElement> charElement);
-
         const interval = mapFirstCharToInterval(context, text);
 
         const continueWriting = function ():void {
             writeText(context, text.slice(1));
             scrollDown(context.config);
         };
+
+        context.to.appendChild(charElement);
+        context.insertedChars.push(<HTMLElement> charElement);
 
         if (interval === 0) {
             continueWriting();

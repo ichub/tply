@@ -491,7 +491,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
      * This is where the magic happens - here we type out text into an HTML Element.
      */
     var writeText = function writeText(context, text) {
-        if (text === "") {
+        if (text === "" || text === " ") {
             context.callback(null);
             return;
         }
@@ -500,13 +500,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             return;
         }
         var charElement = createCharacterElement(text[0]);
-        context.to.appendChild(charElement);
-        context.insertedChars.push(charElement);
         var interval = mapFirstCharToInterval(context, text);
         var continueWriting = function continueWriting() {
             writeText(context, text.slice(1));
             scrollDown(context.config);
         };
+        context.to.appendChild(charElement);
+        context.insertedChars.push(charElement);
         if (interval === 0) {
             continueWriting();
         } else {

@@ -132,5 +132,5 @@ h1 {
     opacity: 1; } }
 
 .cursor {
-  animation: blink 0.5s linear infinite alternate;
-  background-color: black; }
+  animation: blink 0.8s linear infinite alternate;
+  background-color: #545454 !important; }

@@ -144,6 +144,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         function AnimationContext(status, config, rootFrom, from, rootTo, to, callback) {
             var insertedChars = arguments.length <= 7 || arguments[7] === undefined ? [] : arguments[7];
             var extra = arguments.length <= 8 || arguments[8] === undefined ? null : arguments[8];
+            var cursor = arguments.length <= 9 || arguments[9] === undefined ? null : arguments[9];
+            var rootContext = arguments.length <= 10 || arguments[10] === undefined ? null : arguments[10];
 
             _classCallCheck(this, AnimationContext);
 
@@ -157,12 +159,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             this._callback = callback;
             this._insertedChars = insertedChars;
             this._extra = extra;
+            this._cursor = cursor;
+            this._rootContext = rootContext;
         }
 
         _createClass(AnimationContext, [{
             key: "clone",
             value: function clone() {
-                return new AnimationContext(this._status, this._config, this._rootFrom, this._from, this._rootTo, this._to, this._callback, this._insertedChars, this._extra);
+                return new AnimationContext(this._status, this._config, this._rootFrom, this._from, this._rootTo, this._to, this._callback, this._insertedChars, this._extra, this._cursor, this._rootContext);
+            }
+        }, {
+            key: "withRootContext",
+            value: function withRootContext(context) {
+                var clone = this.clone();
+                clone._rootContext = context;
+                context._rootContext = context;
+                return clone;
             }
         }, {
             key: "withFrom",
@@ -259,6 +271,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: "insertedChars",
             get: function get() {
                 return this._insertedChars;
+            }
+        }, {
+            key: "cursor",
+            get: function get() {
+                return this._rootContext._cursor;
+            },
+            set: function set(value) {
+                this._rootContext._cursor = value;
             }
         }]);
 
@@ -493,12 +513,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             setTimeout(continueWriting, interval);
         }
     };
-    var createCursor = function createCursor() {
+    var getCursor = function getCursor(context) {
         var cursor = document.createElement("div");
         cursor.style.display = "inline-block";
         cursor.style.width = "10px";
         cursor.style.height = "10px";
         cursor.style.backgroundColor = "black";
+        if (context.cursor !== null) {
+            context.cursor.parentNode.removeChild(context.cursor);
+        }
+        context.cursor = cursor;
         return cursor;
     };
     var createTypeDestination = function createTypeDestination() {
@@ -518,7 +542,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 }));
                 break;
             case NodeType.Text:
-                var cursor = createCursor();
+                var cursor = getCursor(context);
                 var destination = createTypeDestination();
                 context.to.appendChild(destination);
                 context.to.appendChild(cursor);
@@ -653,10 +677,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             } : arguments[3];
 
             var cancellation = new Status();
-            runAnimation(new AnimationContext(cancellation, conf, from, from, to, to, function () {
+            var context = new AnimationContext(cancellation, conf, from, from, to, to, function () {
                 cancellation.onFinish();
                 callback();
-            }));
+            });
+            context = context.withRootContext(context);
+            runAnimation(context);
             return cancellation;
         }
     };

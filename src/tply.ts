@@ -95,6 +95,7 @@
     }
 
     class AnimationContext {
+        private _rootContext:AnimationContext;
         private _status:Status;
         private _config:IConfiguration;
         private _rootFrom:Node;
@@ -104,6 +105,7 @@
         private _callback:IElementProcessorCallback;
         private _extra:any;
         private _insertedChars:Array<HTMLElement> = [];
+        private _cursor:HTMLElement;
 
         constructor(status:Status,
                     config:IConfiguration,
@@ -113,7 +115,9 @@
                     to:HTMLElement,
                     callback:IElementProcessorCallback,
                     insertedChars = [],
-                    extra = null) {
+                    extra:any = null,
+                    cursor:HTMLElement = null,
+                    rootContext:AnimationContext = null) {
             this._status = status;
             this._config = config;
             this._rootFrom = rootFrom;
@@ -123,6 +127,8 @@
             this._callback = callback;
             this._insertedChars = insertedChars;
             this._extra = extra;
+            this._cursor = cursor;
+            this._rootContext = rootContext;
         }
 
         public clone():AnimationContext {
@@ -135,7 +141,16 @@
                 this._to,
                 this._callback,
                 this._insertedChars,
-                this._extra);
+                this._extra,
+                this._cursor,
+            this._rootContext);
+        }
+
+        public withRootContext(context:AnimationContext):AnimationContext {
+            const clone = this.clone();
+            clone._rootContext = context;
+            context._rootContext = context;
+            return clone;
         }
 
         public withFrom(root:Node):AnimationContext {
@@ -215,6 +230,14 @@
 
         public get insertedChars():Array<HTMLElement> {
             return this._insertedChars;
+        }
+
+        public get cursor():HTMLElement {
+            return this._rootContext._cursor;
+        }
+
+        set cursor(value:HTMLElement) {
+            this._rootContext._cursor = value;
         }
     }
 
@@ -498,13 +521,19 @@
         }
     };
 
-    const createCursor = function ():HTMLElement {
+    const getCursor = function (context:AnimationContext):HTMLElement {
         const cursor = document.createElement("div");
 
         cursor.style.display = "inline-block";
         cursor.style.width = "10px";
         cursor.style.height = "10px";
         cursor.style.backgroundColor = "black";
+
+        if (context.cursor !== null) {
+            context.cursor.parentNode.removeChild(context.cursor);
+        }
+
+        context.cursor = cursor;
 
         return cursor;
     };
@@ -534,7 +563,7 @@
                 }));
                 break;
             case NodeType.Text:
-                const cursor = createCursor();
+                const cursor = getCursor(context);
                 const destination = createTypeDestination();
                 context.to.appendChild(destination);
                 context.to.appendChild(cursor);
@@ -711,7 +740,7 @@
                                conf:IConfiguration = {},
                                callback:() => void = () => null):Status {
                 const cancellation = new Status();
-                runAnimation(new AnimationContext(
+                let context = new AnimationContext(
                     cancellation,
                     conf,
                     from,
@@ -721,7 +750,11 @@
                     function () {
                         cancellation.onFinish();
                         callback();
-                    }));
+                    });
+
+                context = context.withRootContext(context);
+
+                runAnimation(context);
                 return cancellation;
             }
         };

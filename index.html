@@ -165,11 +165,11 @@
 
             hljs.highlightBlock(document.querySelector("#explanation code"));
 
-            let innerText = function(element) {
+            var innerText = function(element) {
                 return element.innerText || element.textContent;
             };
 
-            let setInnerText = function(element, text) {
+            var setInnerText = function(element, text) {
                 if (typeof element.innerText !== "undefined") {
                     element.innerText = text;
                 } else {
@@ -177,24 +177,24 @@
                 }
             };
 
-            let unindentCode = function (text) {
-                let parts = text.split("\n").filter(function (item) {
+            var unindentCode = function (text) {
+                var parts = text.split("\n").filter(function (item) {
                     return item.length > 0;
                 });
 
-                let result = "";
+                var result = "";
 
                 if (parts.length > 0) {
-                    let count = 0;
+                    var count = 0;
                     while (parts[0][count] == " " && count < parts[0].length) {
                         count++;
                     }
 
-                    for (let i = 0; i < parts.length; i++) {
-                        let part = parts[i];
-                        let partText = "";
+                    for (var i = 0; i < parts.length; i++) {
+                        var part = parts[i];
+                        var partText = "";
 
-                        for (let j = count; j < parts[i].length; j++) {
+                        for (var j = count; j < parts[i].length; j++) {
                             partText += part[j];
                         }
 
@@ -209,9 +209,9 @@
                 return result;
             };
 
-            let createCodeElement = function (codeText, language) {
-                let code = document.createElement("code");
-                let pre = document.createElement("pre");
+            var createCodeElement = function (codeText, language) {
+                var code = document.createElement("code");
+                var pre = document.createElement("pre");
 
                 setInnerText(pre, unindentCode(codeText))
 
@@ -221,10 +221,10 @@
                 return code;
             };
 
-            let createExample = function (exampleContainer) {
-                let configurationElement = exampleContainer.querySelector(".configuration");
-                let configObject = {};
-                let hasConfig = false;
+            var createExample = function (exampleContainer) {
+                var configurationElement = exampleContainer.querySelector(".configuration");
+                var configObject = {};
+                var hasConfig = false;
 
                 if (configurationElement !== null && typeof configurationElement !== "undefined") {
                     configObject = eval("configObject = " + innerText(configurationElement));
@@ -232,19 +232,19 @@
                     hasConfig = true;
                 }
 
-                let example = document.createElement("div");
+                var example = document.createElement("div");
                 example.classList.add("example");
 
-                let template = document.createElement("div");
+                var template = document.createElement("div");
                 template.classList.add("tply-template");
                 template.innerHTML = exampleContainer.innerHTML;
                 exampleContainer.innerHTML = "";
 
-                let title = document.createElement("div");
+                var title = document.createElement("div");
                 title.classList.add("title");
                 setInnerText(title, exampleContainer.getAttribute("data-title"));
 
-                let redo = document.createElement("div");
+                var redo = document.createElement("div");
                 redo.classList.add("redo");
                 setInnerText(redo, "redo");
 
@@ -255,29 +255,29 @@
                 example.appendChild(template);
                 exampleContainer.appendChild(example);
 
-                let destination = document.createElement("div");
+                var destination = document.createElement("div");
                 destination.classList.add("tply-destination");
                 template.parentNode.appendChild(destination);
 
-                let code = createCodeElement(template.innerHTML, "html");
+                var code = createCodeElement(template.innerHTML, "html");
                 exampleContainer.appendChild(code);
                 hljs.highlightBlock(code);
 
                 if (hasConfig) {
-                    let separator = document.createElement("div");
+                    var separator = document.createElement("div");
                     separator.classList.add("separator");
                     setInnerText(separator, "With the following configuration:");
                     exampleContainer.appendChild(separator);
 
-                    let config = createCodeElement(innerText(configurationElement), "javascript");
+                    var config = createCodeElement(innerText(configurationElement), "javascript");
                     exampleContainer.appendChild(config);
                     hljs.highlightBlock(config);
                 }
 
-                let status = tply.animate(template, destination, configObject);
+                var status = tply.animate(template, destination, configObject);
 
                 redo.addEventListener("click", function () {
-                    let restart = function () {
+                    var restart = function () {
                         destination.innerHTML = "";
                         status = tply.animate(template, destination, configObject);
                     };
@@ -290,10 +290,10 @@
                 });
             };
 
-            let examples = document.querySelectorAll(".examples .example-container");
+            var examples = document.querySelectorAll(".examples .example-container");
 
-            for (let i = 0; i < examples.length; i++) {
-                let exampleContainer = examples[i];
+            for (var i = 0; i < examples.length; i++) {
+                var exampleContainer = examples[i];
 
                 createExample(exampleContainer)
             }

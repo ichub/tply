@@ -112,7 +112,8 @@
                     rootTo:HTMLElement,
                     to:HTMLElement,
                     callback:IElementProcessorCallback,
-                    insertedChars = []) {
+                    insertedChars = [],
+                    extra = null) {
             this._status = status;
             this._config = config;
             this._rootFrom = rootFrom;
@@ -121,6 +122,7 @@
             this._to = to;
             this._callback = callback;
             this._insertedChars = insertedChars;
+            this._extra = extra;
         }
 
         public clone():AnimationContext {
@@ -132,7 +134,8 @@
                 this._rootTo,
                 this._to,
                 this._callback,
-                this._insertedChars);
+                this._insertedChars,
+                this._extra);
         }
 
         public withFrom(root:Node):AnimationContext {
@@ -424,11 +427,11 @@
         let dataWordInterval = null;
 
         if (typeof referenceTypeNode.getAttribute === "function") {
-            const dataCharInterval = referenceTypeNode.getAttribute("data-char-interval");
-            const dataPeriodInterval = referenceTypeNode.getAttribute("data-period-interval");
-            const dataCommaInterval = referenceTypeNode.getAttribute("data-comma-interval");
-            const dataEndInterval = referenceTypeNode.getAttribute("data-end-interval");
-            const dataWordInterval = referenceTypeNode.getAttribute("data-word-interval");
+            dataCharInterval = referenceTypeNode.getAttribute("data-char-interval");
+            dataPeriodInterval = referenceTypeNode.getAttribute("data-period-interval");
+            dataCommaInterval = referenceTypeNode.getAttribute("data-comma-interval");
+            dataEndInterval = referenceTypeNode.getAttribute("data-end-interval");
+            dataWordInterval = referenceTypeNode.getAttribute("data-word-interval");
         }
 
         const charInterval = parseDuration(dataCharInterval || defaultCharInterval);

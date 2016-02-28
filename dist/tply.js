@@ -143,6 +143,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     var AnimationContext = function () {
         function AnimationContext(status, config, rootFrom, from, rootTo, to, callback) {
             var insertedChars = arguments.length <= 7 || arguments[7] === undefined ? [] : arguments[7];
+            var extra = arguments.length <= 8 || arguments[8] === undefined ? null : arguments[8];
 
             _classCallCheck(this, AnimationContext);
 
@@ -155,12 +156,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             this._to = to;
             this._callback = callback;
             this._insertedChars = insertedChars;
+            this._extra = extra;
         }
 
         _createClass(AnimationContext, [{
             key: "clone",
             value: function clone() {
-                return new AnimationContext(this._status, this._config, this._rootFrom, this._from, this._rootTo, this._to, this._callback, this._insertedChars);
+                return new AnimationContext(this._status, this._config, this._rootFrom, this._from, this._rootTo, this._to, this._callback, this._insertedChars, this._extra);
             }
         }, {
             key: "withFrom",
@@ -436,11 +438,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var dataEndInterval = null;
         var dataWordInterval = null;
         if (typeof referenceTypeNode.getAttribute === "function") {
-            var _dataCharInterval = referenceTypeNode.getAttribute("data-char-interval");
-            var _dataPeriodInterval = referenceTypeNode.getAttribute("data-period-interval");
-            var _dataCommaInterval = referenceTypeNode.getAttribute("data-comma-interval");
-            var _dataEndInterval = referenceTypeNode.getAttribute("data-end-interval");
-            var _dataWordInterval = referenceTypeNode.getAttribute("data-word-interval");
+            dataCharInterval = referenceTypeNode.getAttribute("data-char-interval");
+            dataPeriodInterval = referenceTypeNode.getAttribute("data-period-interval");
+            dataCommaInterval = referenceTypeNode.getAttribute("data-comma-interval");
+            dataEndInterval = referenceTypeNode.getAttribute("data-end-interval");
+            dataWordInterval = referenceTypeNode.getAttribute("data-word-interval");
         }
         var charInterval = parseDuration(dataCharInterval || defaultCharInterval);
         var periodInterval = parseDuration(dataPeriodInterval || defaultPeriodInterval);

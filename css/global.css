@@ -55,8 +55,8 @@ p {
   .examples .example-container {
     background-color: #e6e6e6;
     display: inline-block;
-    min-width: 400px;
-    max-width: 400px;
+    min-width: 450px;
+    max-width: 450px;
     border-radius: 2px;
     position: relative;
     overflow: hidden;

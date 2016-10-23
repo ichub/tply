@@ -1,7 +1,7 @@
 # tply
 [View the demo here!](https://ichub.github.io/tply/)
 
-[Download the (8kb) release `tply.js` here](https://github.com/ichub/tply/releases/tag/1.0.0)
+[Download the (10kb) release `tply.js` here](https://github.com/ichub/tply/releases/tag/1.0.1)
 
 ### What is tply? 
 tply allows you to simulate text being typed out character by character. Here's a "hello world" example:

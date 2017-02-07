@@ -1,5 +1,7 @@
 # tply
-[View the demo here!](https://ichub.github.io/tply/)
+[View the live demo here!](https://ichub.github.io/tply/)
+
+![demo](./demo.gif)
 
 [Download the (10kb) release `tply.js` here](https://github.com/ichub/tply/releases/tag/1.0.1)
 
